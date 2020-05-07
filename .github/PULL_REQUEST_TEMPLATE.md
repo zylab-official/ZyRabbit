@@ -1,6 +1,6 @@
 ### Description
 
-Write a few lines what about the pull request, don't forget to include ticket refereneces to issues it solves.
+Write a few lines what about the pull request, don't forget to include ticket references to issues it solves.
 
 ### Check List
 
