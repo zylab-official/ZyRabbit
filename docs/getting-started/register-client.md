@@ -4,36 +4,36 @@ Depending on the scenario, there are a few different ways to register the client
 
 ### Register from factory
 
-The easiest way to register a new client is by calling `RawRabbitFactory.CreateSingleton`. 
-If no arguments are provided, the local configuration as defined in `RawRabbitConfiguration.Local` will be used (`guest` user on `localhost:5672` with virtual host `/`).
+The easiest way to register a new client is by calling `ZyRabbitFactory.CreateSingleton`.
+If no arguments are provided, the local configuration as defined in `ZyRabbitConfiguration.Local` will be used (`guest` user on `localhost:5672` with virtual host `/`).
 
 ```csharp
-var raw = RawRabbitFactory.CreateSingleton();
+var raw = ZyRabbitFactory.CreateSingleton();
 ```
 
 ### vNext Application Registration
-If the application is bootstrapped from a `vNext` application, the dependencies and client can be registered by using the `AddRawRabbit` extension for `IServiceCollection`
-The package [`RawRabbit.vNext`](https://www.nuget.org/packages/RawRabbit.vNext) contains modules and extension methods for registering `RawRabbit`.
+If the application is bootstrapped from a `vNext` application, the dependencies and client can be registered by using the `AddZyRabbit` extension for `IServiceCollection`
+The package [`ZyRabbit.vNext`](https://www.nuget.org/packages/ZyRabbit.vNext) contains modules and extension methods for registering `ZyRabbit`.
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddRawRabbit(); //optional overrides here, too.
+    services.AddZyRabbit(); //optional overrides here, too.
 }
 ```
 
 ### Autofac Registration
-The package [`RawRabbit.DependencyInjection.Autofac`](https://www.nuget.org/packages/RawRabbit.DependencyInjection.Autofac) contains modules and extension methods for registering `RawRabbit`.
+The package [`ZyRabbit.DependencyInjection.Autofac`](https://www.nuget.org/packages/ZyRabbit.DependencyInjection.Autofac) contains modules and extension methods for registering `ZyRabbit`.
 
 ```csharp
 var builder = new ContainerBuilder();
-builder.RegisterRawRabbit();
+builder.RegisterZyRabbit();
 var container = builder.Build();
-``` 
+```
 
 ### Ninject Registration
-The package [`RawRabbit.DependencyInjection.Ninject`](https://www.nuget.org/packages/RawRabbit.DependencyInjection.Ninject) contains modules and extension methods for registering `RawRabbit`.
+The package [`ZyRabbit.DependencyInjection.Ninject`](https://www.nuget.org/packages/ZyRabbit.DependencyInjection.Ninject) contains modules and extension methods for registering `ZyRabbit`.
 
 ```csharp
 var kernel = new StandardKernel();
-kernel.RegisterRawRabbit();
+kernel.RegisterZyRabbit();

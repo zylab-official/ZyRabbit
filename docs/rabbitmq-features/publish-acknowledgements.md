@@ -1,15 +1,15 @@
 # Publisher Acknowledgements
 
-Publish Acknowledgements (sometimes called _Publish Confirms_) are callbacks from the message broker, verifying that a sent message has been received and handled. When activated, RawRabbit will not complete the corresponding task until the ack is recived. If this has not occured within a given time span (`PublishConfirmTimeout`), the task is cancelled with an `PublishConfirmException` enclosed.
+Publish Acknowledgements (sometimes called _Publish Confirms_) are callbacks from the message broker, verifying that a sent message has been received and handled. When activated, ZyRabbit will not complete the corresponding task until the ack is recived. If this has not occured within a given time span (`PublishConfirmTimeout`), the task is cancelled with an `PublishConfirmException` enclosed.
 
 ## Override timeout configuration
 
-The time out is one second by default, but can be changed by specifying a different value in the provided `RawRabbitConfiguration`.
+The time out is one second by default, but can be changed by specifying a different value in the provided `ZyRabbitConfiguration`.
 
 ```csharp
-var client = RawRabbitFactory.CreateSingleton(new RawRabbitOptions
+var client = ZyRabbitFactory.CreateSingleton(new ZyRabbitOptions
 {
-    Configuration = new RawRabbitConfiguration
+    Configuration = new ZyRabbitConfiguration
     {
         PublishConfirmTimeout = TimeSpan.FromSeconds(2)
     }
@@ -26,7 +26,7 @@ await publisher.PublishAsync(message, ctx => ctx
 
 ## Disable feature
 
-Publish confirm check will be performend if the `PublishConfirmTimeout` is set to `TimeSpan.Max`. To disable the  featulre, simply update the value of `RawRabbitConfiguration` accordingly.
+Publish confirm check will be performend if the `PublishConfirmTimeout` is set to `TimeSpan.Max`. To disable the  featulre, simply update the value of `ZyRabbitConfiguration` accordingly.
 
 To disable publish acknowledge for a specific call, simple add appropriate value to the pipe context.
 

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.6;net451</TargetFrameworks>
+    <Authors>LordMike</Authors>
+    <AssemblyTitle>ZyRabbit.Enrichers.ZeroFormatter</AssemblyTitle>
+    <VersionPrefix>2.0.0</VersionPrefix>
+    <PackageId>ZyRabbit.Enrichers.ZeroFormatter</PackageId>
+    <PackageTags>rabbitmq;zyrabbit;zeroformatter</PackageTags>
+    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
+    <Description>Serialize messages with ZeroFormatter in ZyRabbit</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ZeroFormatter" Version="1.6.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ZyRabbit\ZyRabbit.csproj" />
+  </ItemGroup>
+
+</Project>

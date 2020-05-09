@@ -14,7 +14,7 @@ var client = ZyRabbitFactory.CreateSingleton(new ZyRabbitOptions
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("zyRabbit.json")
     .Build()
-    .Get<RawRabbitConfiguration>(),
+    .Get<ZyRabbitConfiguration>(),
   Plugins = p => p
     .UseProtobuf()
     .UsePolly(c => c

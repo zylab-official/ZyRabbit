@@ -1,6 +1,6 @@
 # Publish
 
-One of the fundamental operations in RabbitMQ is publishing messages. In order to do so, an exchange needs to be declared onto which the messages are published. The exchange, in turn, has topological features and will probably have one or more queues bound to it - with specific routing keys - in order for messages to be consumed downstream. Simply put, there are alot of configuration that needs to be done, and it is not allways straight forward. RawRabbit solves this by supplying sensible default while providing ways to override just about anything.
+One of the fundamental operations in RabbitMQ is publishing messages. In order to do so, an exchange needs to be declared onto which the messages are published. The exchange, in turn, has topological features and will probably have one or more queues bound to it - with specific routing keys - in order for messages to be consumed downstream. Simply put, there are alot of configuration that needs to be done, and it is not allways straight forward. ZyRabbit solves this by supplying sensible default while providing ways to override just about anything.
 
 ## Install Publish Operation packge
 
@@ -8,7 +8,7 @@ the operation `PublishAsync` has its own NuGet package.
 
 ```nuget
 
-  PM> Install-Package RawRabbit.Operations.Publish
+  PM> Install-Package ZyRabbit.Operations.Publish
 ```
 
 One installed the message can be published by calling

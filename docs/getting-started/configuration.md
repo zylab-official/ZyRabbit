@@ -1,12 +1,12 @@
 # Configuration
 
-The default `RawRabbitConfiguration.Local` options can be easily overridden through the `RawRabbitOptions` via the `RawRabbitConfiguration` object when registering your instance. 
+The default `ZyRabbitConfiguration.Local` options can be easily overridden through the `ZyRabbitOptions` via the `ZyRabbitConfiguration` object when registering your instance.
 Here is an example showing various configuration options:
 
 ```csharp
-RawRabbitFactory.CreateSingleton(new RawRabbitOptions()
+ZyRabbitFactory.CreateSingleton(new ZyRabbitOptions()
 {
-	ClientConfiguration = new RawRabbitConfiguration
+	ClientConfiguration = new ZyRabbitConfiguration
 	{
 		Username = "raw",
 		Password = "rabbit",

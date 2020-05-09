@@ -4,7 +4,7 @@ The request operation is the initiating part of RPC calls (sometimes refered to 
 
 ## Default configuration
 
-By default, RawRabbit leverages [direct RPC](https://www.rabbitmq.com/direct-reply-to.html) to enhance performance of the RPC calls. Queues, exchanges and routing keys will be derived from the registered naming convention and configuration object.
+By default, ZyRabbit leverages [direct RPC](https://www.rabbitmq.com/direct-reply-to.html) to enhance performance of the RPC calls. Queues, exchanges and routing keys will be derived from the registered naming convention and configuration object.
 
 ## Providing custom configuration
 

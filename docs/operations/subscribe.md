@@ -1,6 +1,6 @@
 # Subscribe
 
-Subscribe is the act of receiving messages and act upon these. In order for a message to trigger the (user defined) message handler method, it has to be published to an exchange that has a queue bound to it with matching routing key to the published message's. By default RawRabbit setup compatible conventions so that any message published without any custom configuration can be subscribed to without any configuration.
+Subscribe is the act of receiving messages and act upon these. In order for a message to trigger the (user defined) message handler method, it has to be published to an exchange that has a queue bound to it with matching routing key to the published message's. By default ZyRabbit setup compatible conventions so that any message published without any custom configuration can be subscribed to without any configuration.
 
 ## Install Subscribe Operation package
 
@@ -8,7 +8,7 @@ The operation `SubscribeAsync` has its own NuGet package.
 
 ```nuget
 
-  PM> Install-Package RawRabbit.Operations.Subscribe
+  PM> Install-Package ZyRabbit.Operations.Subscribe
 ```
 
 Once installed messages can be subscribed to by calling

@@ -4,7 +4,7 @@ Attribute Routing is a convenient way to specify routing key and other topology 
 The enricher is can be registered as a plugin
 
 ```csharp
-new RawRabbitOptions
+new ZyRabbitOptions
 {
     Plugins = p => p.UseAttributeRouting()
 }

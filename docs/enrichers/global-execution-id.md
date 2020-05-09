@@ -1,14 +1,14 @@
 # Global Execution Id
 
-The Global Message Id is a unique identifier that is created when a message first is published, and then forwarded for messages published within the subscriber of the received message. 
+The Global Message Id is a unique identifier that is created when a message first is published, and then forwarded for messages published within the subscriber of the received message.
 It can be very helpful as a correlation id to trace execution flows over multiple applications.
 
 ## Registration
 
-The Global Message Id can be registered as a plugin in the RawRabbitOptions
+The Global Message Id can be registered as a plugin in the ZyRabbitOptions
 
 ```csharp
-new RawRabbitOptions
+new ZyRabbitOptions
 {
     Plugins = p => p.UseGlobalExecutionId()
 });
@@ -27,7 +27,7 @@ A client can subscribe to messages published with the global message id suffix, 
 The property is added to the `IPipeContext` and passed in the header of the BasicProperties as `global_execution_id`. The plugin is executed in the `ProducerInitialized` state, making it available throughout the execution pipe. It can, for example, be used as a property in the message context
 
 ```csharp
-new RawRabbitOptions
+new ZyRabbitOptions
 {
     Plugins = p => p
         .UseGlobalExecutionId()

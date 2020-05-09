@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.10.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="xunit" Version="2.3.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessageContext.Respond\ZyRabbit.Enrichers.MessageContext.Respond.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessageContext.Subscribe\ZyRabbit.Enrichers.MessageContext.Subscribe.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessageContext\ZyRabbit.Enrichers.MessageContext.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.QueueSuffix\ZyRabbit.Enrichers.QueueSuffix.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Publish\ZyRabbit.Operations.Publish.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Request\ZyRabbit.Operations.Request.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Tools\ZyRabbit.Operations.Tools.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit\ZyRabbit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+
+</Project>
