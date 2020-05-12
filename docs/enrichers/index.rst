@@ -2,8 +2,8 @@
 Enrichers
 =====================================
 
-`RawRabbit` has a number of enrichers that adds functionality to the client.  
- 
+`ZyRabbit` has a number of enrichers that adds functionality to the client.
+
 Contents:
 
 .. toctree::

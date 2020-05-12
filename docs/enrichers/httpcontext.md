@@ -17,7 +17,7 @@ public override Task InvokeAsync(IPipeContext context, CancellationToken token)
 If desired, the enricher can be registered as a plugin, making it available for each pipe execution.
 
 ```csharp
-var options = new RawRabbitOptions
+var options = new ZyRabbitOptions
 {
     Plugins = p => p.UseHttpContext()
 };
@@ -48,7 +48,7 @@ public class CustomContext
 ```
 
 ```csharp
-var client = RawRabbitFactory.CreateSingleton(new RawRabbitOptions
+var client = ZyRabbitFactory.CreateSingleton(new ZyRabbitOptions
 {
     Plugins = p => p
         .UseHttpContext()

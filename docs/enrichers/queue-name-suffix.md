@@ -1,13 +1,13 @@
 # Queue Name Suffix
 
-By default, RawRabbit declares [topic exchanges](https://www.rabbitmq.com/tutorials/tutorial-five-dotnet.html), that allows messages to be routed to all queues with a matching routing key. Only be one copy of the message will be delivered to each queue. This means that if different applications subscribe to the same message _on the same queue_, the message will only be delivered to one of the applications in a round robin fashion.
+By default, ZyRabbit declares [topic exchanges](https://www.rabbitmq.com/tutorials/tutorial-five-dotnet.html), that allows messages to be routed to all queues with a matching routing key. Only be one copy of the message will be delivered to each queue. This means that if different applications subscribe to the same message _on the same queue_, the message will only be delivered to one of the applications in a round robin fashion.
 
 The _Queue Name Suffix Enricher_ can be used to add suffixes to queue names, an thereby distinguishable from other queues. There are different suffixes that can be used to achieve desired delivery patterns.
 
 ## Register Plugin
 
 ```csharp
-var options = new RawRabbitOptions
+var options = new ZyRabbitOptions
 {
     Plugins = ioc => ioc
         .UseApplicationQueueSuffix()

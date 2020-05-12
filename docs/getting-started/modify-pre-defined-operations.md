@@ -2,7 +2,7 @@
 
 ## Understanding Pipes
 
-RawRabbit performs its operations by invoking sequences of middlewares called _pipes_. The `IBusClient` interface contains one method that is used to define a pipe as well as initial values for the pipe context that is being passed and manipulated by middlewares in the pipe
+ZyRabbit performs its operations by invoking sequences of middlewares called _pipes_. The `IBusClient` interface contains one method that is used to define a pipe as well as initial values for the pipe context that is being passed and manipulated by middlewares in the pipe
 
 ```csharp
 public interface IBusClient
@@ -15,7 +15,7 @@ Each of the available operations (like `PublishAsync`, `SubscribeAsync` etc) are
 
 ## Stage-based middleware injection
 
-The sequence of middleware can be (and often are) devided into multiple stages, indicated by the `StageMarkerMiddleware`. As an example. the [Publish pipe](https://github.com/pardahlman/RawRabbit/blob/2.0/src/RawRabbit.Operations.Publish/PublishMessageExtension.cs) has multiple stages including _ExchangeDeclared_, _ChannelCreated_ and _MessagePublished_. It is possible to inject custom middleware that is executed at each stage. This is done by creating a middleware inherit from `StagedMiddleware`.
+The sequence of middleware can be (and often are) devided into multiple stages, indicated by the `StageMarkerMiddleware`. As an example. the [Publish pipe](https://github.com/pardahlman/ZyRabbit/blob/2.0/src/ZyRabbit.Operations.Publish/PublishMessageExtension.cs) has multiple stages including _ExchangeDeclared_, _ChannelCreated_ and _MessagePublished_. It is possible to inject custom middleware that is executed at each stage. This is done by creating a middleware inherit from `StagedMiddleware`.
 
 ```csharp
 public class LogAfterPublishMiddleware : StagedMiddleware
@@ -110,7 +110,7 @@ Depending on scenario, it might be desired to register a middleware for each ope
 Middleware can be registered when instanciating the client, thus adding it to the _all_ pipes that are executed. Changes that affect all pipes are called _Plugins_. This can make perfect sense for client wide changes, such as the `CustomBodySerializationMiddleware` middleware. This can be done with the `Replace` call to the `IPipeBuilder`.
 
 ```csharp
-var client = RawRabbitFactory.CreateSingleton(new RawRabbitOptions
+var client = ZyRabbitFactory.CreateSingleton(new ZyRabbitOptions
   {
     Plugins = plugin => plugin.Register(p => p
       .Replace<BodySerializationMiddleware, CustomBodySerializationMiddleware>())
@@ -134,7 +134,7 @@ public static class CustomSerializerPlugin
 The client can now be registered like this:
 
 ```csharp
-var client = RawRabbitFactory.CreateSingleton(new RawRabbitOptions
+var client = ZyRabbitFactory.CreateSingleton(new ZyRabbitOptions
 {
   Plugins = plugin => plugin.UseCustomerSerializerOverride()
 });

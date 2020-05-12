@@ -1,6 +1,6 @@
 # Message Context
 
-The _Message Context_ is an object that accompanies the actual message. In earlier versions of RawRabbit, the Message Context was mandatory and had to implement the interface `IMessageContext`. Since 2.0, this is an optional feature.
+The _Message Context_ is an object that accompanies the actual message. In earlier versions of ZyRabbit, the Message Context was mandatory and had to implement the interface `IMessageContext`. Since 2.0, this is an optional feature.
 
 ## What makes sense to pass in the Message Context?
 
@@ -10,7 +10,7 @@ It depends on the application. If messages are published on behalf of an authent
 Message Context is enabled for outgoing messages by registering it as a plugin
 
 ```csharp
-new RawRabbitOptions
+new ZyRabbitOptions
 {
     Plugins = p => p
         .UseMessageContext(ctx => new CustomContext
@@ -60,7 +60,7 @@ In the example above, the subscriber method gets access to the entire `BasicDeli
 
 ## Message Context Forwarding
 
-RawRabbit can be configured to forward received message contexts in publishes that happens within the message handler.
+ZyRabbit can be configured to forward received message contexts in publishes that happens within the message handler.
 
 ```csharp
 await firstClient.SubscribeAsync<FirstMessage, CustomContext>((async msg, context) =>
@@ -78,7 +78,7 @@ await secondClient.SubscribeAsync<SecondMessage, CustomContext>((async msg, cont
 The feature can be enabled by registering it as a plugin. As of the current version, both `UseMessageContext<TMessageContext>` and `UseContextForwarding` needs to be registered for this to work.
 
 ```csharp
-new RawRabbitOptions
+new ZyRabbitOptions
 {
     Plugins = p => p
         .UseMessageContext<TodoContext>()

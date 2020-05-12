@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Authors>par.dahlman</Authors>
+    <TargetFramework>net46</TargetFramework>
+    <AssemblyName>ZyRabbit.IntegrationTests</AssemblyName>
+    <PackageId>ZyRabbit.IntegrationTests</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessagePack\ZyRabbit.Enrichers.MessagePack.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.Protobuf\ZyRabbit.Enrichers.Protobuf.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.RetryLater\ZyRabbit.Enrichers.RetryLater.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.ZeroFormatter\ZyRabbit.Enrichers.ZeroFormatter.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Tools\ZyRabbit.Operations.Tools.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit\ZyRabbit.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Compatibility.Legacy\ZyRabbit.Compatibility.Legacy.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Get\ZyRabbit.Operations.Get.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Publish\ZyRabbit.Operations.Publish.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Subscribe\ZyRabbit.Operations.Subscribe.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Request\ZyRabbit.Operations.Request.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.Respond\ZyRabbit.Operations.Respond.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.StateMachine\ZyRabbit.Operations.StateMachine.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Operations.MessageSequence\ZyRabbit.Operations.MessageSequence.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.QueueSuffix\ZyRabbit.Enrichers.QueueSuffix.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.GlobalExecutionId\ZyRabbit.Enrichers.GlobalExecutionId.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.Polly\ZyRabbit.Enrichers.Polly.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.Attributes\ZyRabbit.Enrichers.Attributes.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessageContext\ZyRabbit.Enrichers.MessageContext.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessageContext.Subscribe\ZyRabbit.Enrichers.MessageContext.Subscribe.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessageContext.Respond\ZyRabbit.Enrichers.MessageContext.Respond.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.Autofac\ZyRabbit.DependencyInjection.Autofac.csproj" />
+    <ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.Ninject\ZyRabbit.DependencyInjection.Ninject.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170106-08" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
+    <PackageReference Include="Moq" Version="4.7.137" />
+    <PackageReference Include="xunit" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="1.0.2" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

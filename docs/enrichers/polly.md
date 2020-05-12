@@ -1,6 +1,6 @@
 # Polly
 
-The Polly enrichers provides an easy way to configure retry policies using [Polly](http://www.thepollyproject.org/). It's possible to register a default policy as well as specialized policies for different specific calls in RawRabbit.
+The Polly enrichers provides an easy way to configure retry policies using [Polly](http://www.thepollyproject.org/). It's possible to register a default policy as well as specialized policies for different specific calls in ZyRabbit.
 
 ## Register plugin
 
@@ -9,11 +9,11 @@ The Polly enricher can be registered as a plugin
 ```csharp
 var policy = Policy
   .Handle<Exception>()
-  .RetryAsync((exception, retryCount, pollyContext) => 
+  .RetryAsync((exception, retryCount, pollyContext) =>
     /* retry implementation */
   );
 
-var busClient = RawRabitFactory.CreateSingleton(new RawRabbitOptions
+var busClient = RawRabitFactory.CreateSingleton(new ZyRabbitOptions
   {
     Plugins = p => p.UsePolly(c => c.UsePolicy(policy)
     )
@@ -37,7 +37,7 @@ All available policies are keyed from `PolicyKey.cs` and added to the `IPipeCont
 Below is an example of how to register multiple policies
 
 ```csharp
-var options = new RawRabbitOptions
+var options = new ZyRabbitOptions
 {
   Plugins = p => p.UsePolly(c => c
     .UsePolicy(defaultPolicy)
@@ -63,4 +63,4 @@ It is of course possible to handle all exceptions in the same policy by use `Han
 
 ## Polly Context
 
-RawRabbit adds a few keys to the Polly context that is available when defining retry strategies. These keys are defined in `RetryKeys.cs`. The context includes relevant data for the operation. It always includes `Retry.CancellationToken`, which is the cancellation top level cancellation token. This means that the operation can be cancelled at any time in the retry policies. That will halt the execution and throw an `OperatinCancelledException`.
+ZyRabbit adds a few keys to the Polly context that is available when defining retry strategies. These keys are defined in `RetryKeys.cs`. The context includes relevant data for the operation. It always includes `Retry.CancellationToken`, which is the cancellation top level cancellation token. This means that the operation can be cancelled at any time in the retry policies. That will halt the execution and throw an `OperatinCancelledException`.
