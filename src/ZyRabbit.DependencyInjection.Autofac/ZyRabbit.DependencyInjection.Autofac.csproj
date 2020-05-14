@@ -5,7 +5,7 @@
     <AssemblyTitle>ZyRabbit.DependencyInjection.Autofac</AssemblyTitle>
     <VersionPrefix>2.0.0</VersionPrefix>
     <Authors>par.dahlman</Authors>
-    <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit.DependencyInjection.Autofac</AssemblyName>
     <PackageId>ZyRabbit.DependencyInjection.Autofac</PackageId>
     <PackageTags>rabbitmq;zyrabbit;autofac;ioc</PackageTags>
@@ -19,8 +19,8 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.5|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD1_5;LIBLOG_PORTABLE</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;LIBLOG_PORTABLE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

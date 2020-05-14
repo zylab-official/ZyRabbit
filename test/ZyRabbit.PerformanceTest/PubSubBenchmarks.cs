@@ -14,7 +14,7 @@ namespace ZyRabbit.PerformanceTest
 		private Message _message;
 		public event EventHandler MessageReceived;
 		public delegate void MessageReceivedEventHandler(EventHandler e);
-
+		
 		[Setup]
 		public void Setup()
 		{

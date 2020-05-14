@@ -5,7 +5,7 @@
     <AssemblyTitle>ZyRabbit</AssemblyTitle>
     <VersionPrefix>2.0.0</VersionPrefix>
     <Authors>pardahlman;enrique-avalon</Authors>
-    <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit</AssemblyName>
     <PackageId>ZyRabbit</PackageId>
     <PackageTags>rabbitmq;zyrabbit;amqp</PackageTags>

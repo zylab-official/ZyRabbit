@@ -7,7 +7,7 @@ namespace ZyRabbit.Enrichers.HttpContext
 {
 	public class AspNetCoreHttpContextMiddleware : StagedMiddleware
 	{
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
 		private readonly Microsoft.AspNetCore.Http.IHttpContextAccessor _httpAccessor;
 
 		public AspNetCoreHttpContextMiddleware(Microsoft.AspNetCore.Http.IHttpContextAccessor httpAccessor)
@@ -19,7 +19,7 @@ namespace ZyRabbit.Enrichers.HttpContext
 
 		public override Task InvokeAsync(IPipeContext context, CancellationToken token = new CancellationToken())
 		{
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
 			context.UseHttpContext(_httpAccessor.HttpContext);
 #endif
 			return Next.InvokeAsync(context, token);

@@ -5,7 +5,7 @@
     <AssemblyTitle>ZyRabbit.Enrichers.RetryLater</AssemblyTitle>
     <VersionPrefix>2.0.0</VersionPrefix>
     <Authors>pardahlman</Authors>
-    <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit.Enrichers.RetryLater</AssemblyName>
     <PackageId>ZyRabbit.Enrichers.RetryLater</PackageId>
     <PackageTags>rabbitmq;zyrabbit;enrichers;retry-later</PackageTags>
@@ -17,8 +17,8 @@
     <RootNamespace>ZyRabbit</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.5|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD1_5</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
