@@ -17,9 +17,9 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.207
-    - name: Install dependencies
+    - name: Restore
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
+#    - name: Test
+#      run: dotnet test --no-restore --verbosity normal
