@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Description>Exception handling and retry policies with Polly.</Description>
     <AssemblyTitle>ZyRabbit.Enrichers.Polly</AssemblyTitle>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>pardahlman</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit.Enrichers.Polly</AssemblyName>
     <PackageId>ZyRabbit.Enrichers.Polly</PackageId>
     <PackageTags>rabbitmq;zyrabbit;policy;polly</PackageTags>
-    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

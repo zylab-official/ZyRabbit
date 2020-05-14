@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Description>Enrich the BusClient with a Subscribe method that has argument for Message Context.</Description>
     <AssemblyTitle>ZyRabbit.Enrichers.MessageContext.Subscribe</AssemblyTitle>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>pardahlman;enrique-avalon</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit.Enrichers.MessageContext.Subscribe</AssemblyName>
     <PackageId>ZyRabbit.Enrichers.MessageContext.Subscribe</PackageId>
     <PackageTags>rabbitmq;zyrabbit;subscribe;operation;messagecontext</PackageTags>
-    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

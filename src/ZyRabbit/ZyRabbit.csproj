@@ -3,20 +3,22 @@
   <PropertyGroup>
     <Description>A modern framework for communication over RabbitMq.</Description>
     <AssemblyTitle>ZyRabbit</AssemblyTitle>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>pardahlman;enrique-avalon</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit</AssemblyName>
-    <PackageId>ZyRabbit</PackageId>
+    <PackageId>test1</PackageId>
     <PackageTags>rabbitmq;zyrabbit;amqp</PackageTags>
-    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
+	<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <DefineConstants>LIBLOG_PORTABLE</DefineConstants>
   </PropertyGroup>
-
+	<ItemGroup>
+		<None Include="..\..\icon.png" Pack="true" PackagePath=""/>
+	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="RabbitMQ.Client" Version="5.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />

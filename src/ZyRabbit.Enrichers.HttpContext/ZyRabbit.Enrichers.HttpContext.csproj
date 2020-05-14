@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Description>Enrich the IPipeContext with current HttpContext</Description>
     <AssemblyTitle>ZyRabbit.Enrichers.HttpContext</AssemblyTitle>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>pardahlman</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit.Enrichers.HttpContext</AssemblyName>
     <PackageId>ZyRabbit.Enrichers.HttpContext</PackageId>
     <PackageTags>rabbitmq;zyrabbit;httpcontext</PackageTags>
-    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

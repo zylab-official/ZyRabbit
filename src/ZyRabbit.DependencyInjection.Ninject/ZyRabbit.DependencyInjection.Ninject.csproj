@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Description>Wire up ZyRabbit with Ninject!</Description>
     <AssemblyTitle>ZyRabbit.DependencyInjection.Ninject</AssemblyTitle>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>par.dahlman;Joshua Barron</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit.DependencyInjection.Ninject</AssemblyName>
     <PackageId>ZyRabbit.DependencyInjection.Ninject</PackageId>
     <PackageTags>rabbitmq;zyrabbit;ninject;ioc</PackageTags>
-    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>

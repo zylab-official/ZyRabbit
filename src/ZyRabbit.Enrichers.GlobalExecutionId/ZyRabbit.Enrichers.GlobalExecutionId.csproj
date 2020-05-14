@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Description>Message headers and routing with Global Execution Id</Description>
     <AssemblyTitle>ZyRabbit.Enrichers.GlobalExecutionId</AssemblyTitle>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>pardahlman</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit.Enrichers.GlobalExecutionId</AssemblyName>
     <PackageId>ZyRabbit.Enrichers.GlobalExecutionId</PackageId>
     <PackageTags>rabbitmq;zyrabbit;global;executionid</PackageTags>
-    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

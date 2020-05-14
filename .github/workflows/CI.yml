@@ -1,4 +1,4 @@
-name: .NET Core
+name: CI
 
 on:
   push:
@@ -16,10 +16,25 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.2.207
+        dotnet-version: 3.1.100
+        source-url: https://apiint.nugettest.org/v3/index.json
+      env:
+        NUGET_AUTH_TOKEN: testkey
     - name: Restore
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
 #    - name: Test
 #      run: dotnet test --no-restore --verbosity normal
+    - name: Package
+      run: dotnet pack --configuration Release
+      working-directory: ./src/ZyRabbit
+    - name: Publish to nuget
+      run: dotnet nuget push *.nupkg
+      working-directory: ./src/ZyRabbit/bin/Release/
+    
+    - uses: actions/upload-artifact@v2
+      name: Upload artifact
+      with:
+        name: my-artifact
+        path: .src/ZyRabbit/Release/*.nupkg
