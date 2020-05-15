@@ -86,6 +86,7 @@ jobs:
     
     - name: Outcome
       run: |
+        echo "Process outcome:"
         if [ "$NAME" != "" ]; 
         then
             echo "Package $NAME published and tagged with $VERSION ."
