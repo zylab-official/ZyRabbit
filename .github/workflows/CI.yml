@@ -25,7 +25,6 @@ jobs:
     
     - name: Set icon
       run: |
-        echo "${ PROJECTPATH }"
         DIR=$(dirname "$PROJECTPATH")
         DIR=$"${DIR}/icon.png"
         cp "./icon.png" "${DIR}"
