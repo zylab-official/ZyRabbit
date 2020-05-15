@@ -12,7 +12,7 @@ on:
     - '.github/workflows/**'
 
 jobs:
-  build:
+  Publish nuget:
 
     runs-on: ubuntu-latest
 
@@ -30,9 +30,9 @@ jobs:
     
     - name: Get icon
       run: |
-        DIR=$(dirname "$PROJECTPATH")
-        DIR=$"${DIR}/icon.png"
-        cp "./icon.png" "${DIR}"
+        PROJECTDIR=$(dirname "$PROJECTPATH")
+        PROJECTDIR=$"${PROJECTDIR}/icon.png"
+        cp "./icon.png" "${PROJECTDIR}"
       env:
         PROJECTPATH: ${{ env.PROJECTPATH }}
     
@@ -47,7 +47,7 @@ jobs:
         PROJECTPATH: ${{ env.PROJECTPATH }}
         
 #    - name: Test
-#      run: dotnet test "${env.PROJECTPATH}" --no-restore --verbosity normal
+#      run: dotnet test "$PROJECTPATH" --no-restore --verbosity normal
 #      env:
 #        PROJECTPATH: ${{ env.PROJECTPATH }}
         
