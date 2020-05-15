@@ -83,5 +83,5 @@ jobs:
     - uses: actions/upload-artifact@v2
       name: Upload artifact
       with:
-        name: "${{ env.PACKAGE }}"
-        path: ./src/ZyRabbit/nupkg/*.nupkg
+        name: "${{ steps.publish_nuget.outputs.PACKAGE_NAME }}"
+        path: "${{ steps.publish_nuget.outputs.PACKAGE_PATH }}"
