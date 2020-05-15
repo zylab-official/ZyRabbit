@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches: 
-     - actions
+     - master
   pull_request:
     branches: 
-     - actions
+     - master
     paths:
     - '/src/ZyRabbit/**'
     - '.github/workflows/**'
