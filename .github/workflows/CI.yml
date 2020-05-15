@@ -30,7 +30,8 @@ jobs:
     - name: Publish nuget package
       run: |
         name = $(find . -name "*.nupkg" -type f -print0)
-        echo '::set-env name=PACKAGE::' + name
+        setVariable= "::set-env name=PACKAGE::${name}"
+        echo "${setVariable}"
 # name | xargs -0 -I pkg dotnet nuget push pkg -k $nuget_api_key -s "https://apiint.nugettest.org/v3/index.json" --skip-duplicate
       env:
         nuget_api_key: ${{ secrets.INTEGRATION_NUGET_TOKEN }}
