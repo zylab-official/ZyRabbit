@@ -92,6 +92,7 @@ jobs:
         else
             echo "Package publishing skipped."
         fi;
+      shell: bash
       env:
         NAME: ${{ steps.publish_nuget.outputs.PACKAGE_NAME }}
         VERSION: ${{ steps.publish_nuget.outputs.VERSION }}
