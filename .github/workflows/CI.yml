@@ -20,14 +20,14 @@ jobs:
     
     - name: Set project
       run: |
-      export PROJECTPATH="./src/ZyRabbit/ZyRabbit.csproj"
-      echo "::set-env name=PROJECTPATH::$PROJECTPATH"
+        export PROJECTPATH="./src/ZyRabbit/ZyRabbit.csproj"
+        echo "::set-env name=PROJECTPATH::$PROJECTPATH"
     
     - name: Set icon
       run: |
-      DIR=$(dirname "${PROJECTPATH}")
-      DIR=DIR + "/icon.png"
-      cp "./icon.png" DIR
+        DIR=$(dirname "${PROJECTPATH}")
+        DIR=DIR + "/icon.png"
+        cp "./icon.png" DIR
       
     - name: Restore
       run: dotnet restore "$PROJECTPATH"
