@@ -41,4 +41,3 @@ jobs:
       with:
         name: "${{env.PACKAGE}}"
         path: ./src/ZyRabbit/nupkg/*.nupkg
-      env: 
