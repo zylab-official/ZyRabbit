@@ -26,19 +26,19 @@ jobs:
     - name: Set icon
       run: |
         echo "${ PROJECTPATH }"
-        DIR=$(dirname "${ PROJECTPATH }")
+        DIR=$(dirname "$PROJECTPATH")
         DIR=$"${DIR}/icon.png"
         cp "./icon.png" "${DIR}"
       env:
         PROJECTPATH: ${{ env.PROJECTPATH }}
     
     - name: Restore
-      run: dotnet restore "${ PROJECTPATH }"
+      run: dotnet restore "$PROJECTPATH"
       env:
         PROJECTPATH: ${{ env.PROJECTPATH }}
     
     - name: Build
-      run: dotnet build "${ PROJECTPATH }" --configuration Release --no-restore
+      run: dotnet build "$PROJECTPATH" --configuration Release --no-restore
       env:
         PROJECTPATH: ${{ env.PROJECTPATH }}
         
