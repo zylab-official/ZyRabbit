@@ -7,7 +7,7 @@
     <Authors>pardahlman;enrique-avalon</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit</AssemblyName>
-    <PackageId>test1</PackageId>
+    <PackageId>ZyRabbit</PackageId>
     <PackageTags>rabbitmq;zyrabbit;amqp</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageIcon>icon.png</PackageIcon>
