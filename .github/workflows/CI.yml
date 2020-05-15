@@ -2,9 +2,14 @@ name: CI
 
 on:
   push:
-    branches: [ actions ]
+    branches: 
+     - actions
   pull_request:
-    branches: [ actions ]
+    branches: 
+     - actions
+    paths:
+    - '/src/ZyRabbit/**'
+    - '.github/workflows/**'
 
 jobs:
   build:
@@ -18,12 +23,12 @@ jobs:
       with:
         dotnet-version: 3.1.100
     
-    - name: Set project
+    - name: Set project path
       run: |
         export PROJECT="./src/ZyRabbit/ZyRabbit.csproj"
         echo "::set-env name=PROJECTPATH::$PROJECT"
     
-    - name: Set icon
+    - name: Get icon
       run: |
         DIR=$(dirname "$PROJECTPATH")
         DIR=$"${DIR}/icon.png"
@@ -46,7 +51,7 @@ jobs:
 #      env:
 #        PROJECTPATH: ${{ env.PROJECTPATH }}
         
-    - name: publish on version change
+    - name: Publish on version change
       id: publish_nuget
       uses: rohith/publish-nuget@v2
       with:
@@ -78,10 +83,11 @@ jobs:
         NUGET_SOURCE: https://apiint.nugettest.org
 
         # Flag to toggle pushing symbols along with nuget package to the server, disabled by default
-        # INCLUDE_SYMBOLS: false
+        INCLUDE_SYMBOLS: true
       
     - uses: actions/upload-artifact@v2
       name: Upload artifact
       with:
         name: "${{ steps.publish_nuget.outputs.PACKAGE_NAME }}"
         path: "${{ steps.publish_nuget.outputs.PACKAGE_PATH }}"
+      if: steps.publish_nuget.outputs.PACKAGE_NAME != ''
