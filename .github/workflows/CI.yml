@@ -26,8 +26,8 @@ jobs:
     - name: Set icon
       run: |
         DIR=$(dirname "${PROJECTPATH}")
-        DIR=DIR + "/icon.png"
-        cp "./icon.png" DIR
+        DIR=$"${DIR}/icon.png"
+        cp "./icon.png" "${DIR}"
       
     - name: Restore
       run: dotnet restore "$PROJECTPATH"
