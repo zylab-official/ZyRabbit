@@ -30,10 +30,10 @@ jobs:
         cp "./icon.png" "${DIR}"
       
     - name: Restore
-      run: dotnet restore "$PROJECTPATH"
+      run: dotnet restore "${PROJECTPATH}"
     
     - name: Build
-      run: dotnet build "$PROJECTPATH" --configuration Release --no-restore
+      run: dotnet build "${PROJECTPATH}" --configuration Release --no-restore
 
 #    - name: Test
 #      run: dotnet test "$PROJECTPATH" --no-restore --verbosity normal
@@ -43,7 +43,7 @@ jobs:
       uses: rohith/publish-nuget@v2
       with:
         # Filepath of the project to be packaged, relative to root of repository
-        PROJECT_FILE_PATH: $PROJECTPATH
+        PROJECT_FILE_PATH: "${PROJECTPATH}"
         
         # NuGet package id, used for version detection & defaults to project name
         # PACKAGE_NAME: Core
