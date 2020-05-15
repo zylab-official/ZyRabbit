@@ -83,17 +83,3 @@ jobs:
         name: "${{ steps.publish_nuget.outputs.PACKAGE_NAME }}"
         path: "${{ steps.publish_nuget.outputs.PACKAGE_PATH }}"
       if: steps.publish_nuget.outputs.PACKAGE_NAME != ''
-    
-    - name: Outcome
-      run: |
-        echo "Process outcome:"
-        if [ "$NAME" != "" ]; 
-        then
-            echo "Package published and tagged."
-        else
-            echo "Package publishing skipped."
-        fi;
-      shell: bash
-      env:
-        NAME: ${{ steps.publish_nuget.outputs.PACKAGE_NAME }}
-        VERSION: ${{ steps.publish_nuget.outputs.VERSION }}
