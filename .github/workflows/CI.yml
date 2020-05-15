@@ -25,26 +25,34 @@ jobs:
     
     - name: Set icon
       run: |
-        echo "${ env.PROJECTPATH }"
-        DIR=$(dirname "${ env.PROJECTPATH }")
+        echo "${ PROJECTPATH }"
+        DIR=$(dirname "${ PROJECTPATH }")
         DIR=$"${DIR}/icon.png"
         cp "./icon.png" "${DIR}"
-      
+      env:
+        PROJECTPATH: ${{ env.PROJECTPATH }}
+    
     - name: Restore
-      run: dotnet restore "${ env.PROJECTPATH }"
+      run: dotnet restore "${ PROJECTPATH }"
+      env:
+        PROJECTPATH: ${{ env.PROJECTPATH }}
     
     - name: Build
-      run: dotnet build "${ env.PROJECTPATH }" --configuration Release --no-restore
-
+      run: dotnet build "${ PROJECTPATH }" --configuration Release --no-restore
+      env:
+        PROJECTPATH: ${{ env.PROJECTPATH }}
+        
 #    - name: Test
 #      run: dotnet test "${env.PROJECTPATH}" --no-restore --verbosity normal
-          
+       env:
+        PROJECTPATH: ${{ env.PROJECTPATH }}
+        
     - name: publish on version change
       id: publish_nuget
       uses: rohith/publish-nuget@v2
       with:
         # Filepath of the project to be packaged, relative to root of repository
-        PROJECT_FILE_PATH: ${env.PROJECTPATH}
+        PROJECT_FILE_PATH: ${{ env.PROJECTPATH }}
         
         # NuGet package id, used for version detection & defaults to project name
         # PACKAGE_NAME: Core
