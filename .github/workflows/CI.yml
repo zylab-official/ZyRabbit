@@ -13,25 +13,37 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.100
+    
+    - name: Set project
+      run: |
+      export PROJECTPATH="./src/ZyRabbit/ZyRabbit.csproj"
+      echo "::set-env name=PROJECTPATH::$PROJECTPATH"
+    
+    - name: Set icon
+      run: |
+      DIR=$(dirname "${PROJECTPATH}")
+      DIR=DIR + "/icon.png"
+      cp "./icon.png" DIR
+      
     - name: Restore
-      run: dotnet restore
+      run: dotnet restore "$PROJECTPATH"
+    
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build "$PROJECTPATH" --configuration Release --no-restore
+
 #    - name: Test
-#      run: dotnet test --no-restore --verbosity normal
-    - name: Package
-      run: dotnet pack --configuration Release -o nupkg
-      working-directory: ./src/ZyRabbit
+#      run: dotnet test "$PROJECTPATH" --no-restore --verbosity normal
+          
     - name: publish on version change
       id: publish_nuget
       uses: rohith/publish-nuget@v2
       with:
         # Filepath of the project to be packaged, relative to root of repository
-        PROJECT_FILE_PATH: ./src/ZyRabbit/ZyRabbit.csproj
+        PROJECT_FILE_PATH: $PROJECTPATH
         
         # NuGet package id, used for version detection & defaults to project name
         # PACKAGE_NAME: Core
