@@ -12,13 +12,13 @@ on:
     - '.github/workflows/**'
 
 jobs:
-  Publish nuget:
+  publish_nuget:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: setup .NET Core
+    - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.100
