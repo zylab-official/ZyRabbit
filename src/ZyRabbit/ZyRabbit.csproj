@@ -9,8 +9,6 @@
     <AssemblyName>ZyRabbit</AssemblyName>
     <PackageId>ZyRabbit</PackageId>
     <PackageTags>rabbitmq;zyrabbit;amqp</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
-    <PackageIcon>icon.png</PackageIcon>
 	<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
