@@ -90,6 +90,7 @@ jobs:
             echo "Package $NAME published and tagged with $VERSION ."
         else
             echo "Package publishing skipped."
+        fi
       env:
-        NAME: "${{ steps.publish_nuget.outputs.PACKAGE_NAME }}"
-        VERSION: "${{ steps.publish_nuget.outputs.VERSION }}"
+        NAME: ${{ steps.publish_nuget.outputs.PACKAGE_NAME }}
+        VERSION: ${{ steps.publish_nuget.outputs.VERSION }}
