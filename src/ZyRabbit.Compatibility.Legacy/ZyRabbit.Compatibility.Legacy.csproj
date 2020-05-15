@@ -9,7 +9,6 @@
     <AssemblyName>ZyRabbit.Compatibility.Legacy</AssemblyName>
     <PackageId>ZyRabbit.Compatibility.Legacy</PackageId>
     <PackageTags>rabbitmq;zyrabbit;compatibility</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

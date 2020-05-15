@@ -8,7 +8,6 @@
     <AssemblyName>ZyRabbit.DependencyInjection.ServiceCollection</AssemblyName>
     <PackageId>ZyRabbit.DependencyInjection.ServiceCollection</PackageId>
     <PackageTags>rabbitmq;raw;zyrabbit;di;ioc;servicecollection</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

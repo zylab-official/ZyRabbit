@@ -9,7 +9,6 @@
     <AssemblyName>ZyRabbit.Enrichers.MessageContext.Subscribe</AssemblyName>
     <PackageId>ZyRabbit.Enrichers.MessageContext.Subscribe</PackageId>
     <PackageTags>rabbitmq;zyrabbit;subscribe;operation;messagecontext</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

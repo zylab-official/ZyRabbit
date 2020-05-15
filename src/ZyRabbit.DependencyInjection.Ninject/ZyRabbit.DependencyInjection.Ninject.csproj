@@ -9,7 +9,6 @@
     <AssemblyName>ZyRabbit.DependencyInjection.Ninject</AssemblyName>
     <PackageId>ZyRabbit.DependencyInjection.Ninject</PackageId>
     <PackageTags>rabbitmq;zyrabbit;ninject;ioc</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>

@@ -9,7 +9,6 @@
     <AssemblyName>ZyRabbit.Enrichers.Polly</AssemblyName>
     <PackageId>ZyRabbit.Enrichers.Polly</PackageId>
     <PackageTags>rabbitmq;zyrabbit;policy;polly</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

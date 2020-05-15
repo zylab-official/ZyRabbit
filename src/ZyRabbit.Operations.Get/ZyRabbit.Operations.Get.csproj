@@ -9,7 +9,6 @@
     <AssemblyName>ZyRabbit.Operations.Get</AssemblyName>
     <PackageId>ZyRabbit.Operations.Get</PackageId>
     <PackageTags>rabbitmq;zyrabbit;operation;get</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

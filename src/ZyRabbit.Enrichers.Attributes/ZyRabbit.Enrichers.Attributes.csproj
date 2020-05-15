@@ -9,7 +9,6 @@
     <AssemblyName>ZyRabbit.Enrichers.Attributes</AssemblyName>
     <PackageId>ZyRabbit.Enrichers.Attributes</PackageId>
     <PackageTags>rabbitmq;zyrabbit;attributes</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

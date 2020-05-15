@@ -9,7 +9,6 @@
     <AssemblyName>ZyRabbit.Operations.Publish</AssemblyName>
     <PackageId>ZyRabbit.Operations.Publish</PackageId>
     <PackageTags>rabbitmq;zyrabbit;operation;publish</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>

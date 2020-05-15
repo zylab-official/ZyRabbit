@@ -7,7 +7,6 @@
     <VersionPrefix>1.0.0</VersionPrefix>
     <PackageId>ZyRabbit.Enrichers.ZeroFormatter</PackageId>
     <PackageTags>rabbitmq;zyrabbit;zeroformatter</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <Description>Serialize messages with ZeroFormatter in ZyRabbit</Description>
   </PropertyGroup>

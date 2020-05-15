@@ -9,7 +9,6 @@
     <AssemblyName>ZyRabbit.Operations.StateMachine</AssemblyName>
     <PackageId>ZyRabbit.Operations.StateMachine</PackageId>
     <PackageTags>rabbitmq;zyrabbit;operation;statemachine;stateless</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/zylab-official/ZyRabbit/actions/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
