@@ -86,7 +86,7 @@ jobs:
     
     - name: Outcome
       run: |
-        if "$NAME" != ""; then
+        if $"$NAME" != ""; then
             echo "Package $NAME published and tagged with $VERSION ."
         else
             echo "Package publishing skipped."

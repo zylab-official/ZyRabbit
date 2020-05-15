@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>A modern framework for communication over RabbitMq.</Description>
     <AssemblyTitle>ZyRabbit</AssemblyTitle>
-    <VersionPrefix>1.0.7</VersionPrefix>
+    <VersionPrefix>1.0.8</VersionPrefix>
     <Authors>pardahlman;enrique-avalon;matei.navidad;ivan.abragimovich</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit</AssemblyName>
