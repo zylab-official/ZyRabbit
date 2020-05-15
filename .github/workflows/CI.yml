@@ -44,8 +44,8 @@ jobs:
         
 #    - name: Test
 #      run: dotnet test "${env.PROJECTPATH}" --no-restore --verbosity normal
-       env:
-        PROJECTPATH: ${{ env.PROJECTPATH }}
+#      env:
+#        PROJECTPATH: ${{ env.PROJECTPATH }}
         
     - name: publish on version change
       id: publish_nuget
