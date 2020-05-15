@@ -32,7 +32,7 @@ jobs:
         export NAME="$(find . -name '*.nupkg' -type f -exec basename {} ';')"
         echo "nuget package is $NAME"
         echo "::set-env name=PACKAGE::$NAME"
-        echo "./$NAME | xargs -0 -I pkg dotnet nuget push pkg -k $nuget_api_key -s 'https://apiint.nugettest.org/v3/index.json' --skip-duplicate"
+        $("./$NAME | xargs -0 -I pkg dotnet nuget push pkg -k $nuget_api_key -s 'https://apiint.nugettest.org/v3/index.json' --skip-duplicate")
       env:
         nuget_api_key: ${{ secrets.INTEGRATION_NUGET_TOKEN }}
       working-directory: ./src/ZyRabbit/nupkg
