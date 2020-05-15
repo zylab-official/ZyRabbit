@@ -86,10 +86,10 @@ jobs:
     
     - name: Outcome
       run: |
-        if "$INPUT_NAME" != ""; then
-            echo "Package $INPUT_NAME published and tagged with $INPUT_VERSION ."
+        if "$NAME" != ""; then
+            echo "Package $NAME published and tagged with $VERSION ."
         else
             echo "Package publishing skipped."
-      with:
+      env:
         NAME: "${{ steps.publish_nuget.outputs.PACKAGE_NAME }}"
         VERSION: "${{ steps.publish_nuget.outputs.VERSION }}"
