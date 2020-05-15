@@ -89,7 +89,7 @@ jobs:
         echo "Process outcome:"
         if [ "$NAME" != "" ]; 
         then
-            echo "Package $NAME published and tagged with $VERSION ."
+            echo "Package published and tagged."
         else
             echo "Package publishing skipped."
         fi;
