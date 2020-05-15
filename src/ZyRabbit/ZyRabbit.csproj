@@ -4,7 +4,7 @@
     <Description>A modern framework for communication over RabbitMq.</Description>
     <AssemblyTitle>ZyRabbit</AssemblyTitle>
     <VersionPrefix>1.0.6</VersionPrefix>
-    <Authors>pardahlman;enrique-avalon</Authors>
+    <Authors>pardahlman;enrique-avalon;matei.navidad;ivan.abragimovich</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit</AssemblyName>
     <PackageId>ZyRabbit</PackageId>
@@ -18,7 +18,14 @@
     <PackageReference Include="RabbitMQ.Client" Version="5.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
   </ItemGroup>
+	<ItemGroup>
+	  <None Include="..\..\icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
+	</ItemGroup>
 	<PropertyGroup>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
 </Project>

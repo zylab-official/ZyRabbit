@@ -28,14 +28,6 @@ jobs:
         export PROJECT="./src/ZyRabbit/ZyRabbit.csproj"
         echo "::set-env name=PROJECTPATH::$PROJECT"
     
-    - name: Get icon
-      run: |
-        PROJECTDIR=$(dirname "$PROJECTPATH")
-        PROJECTDIR=$"${PROJECTDIR}/icon.png"
-        cp "./icon.png" "${PROJECTDIR}"
-      env:
-        PROJECTPATH: ${{ env.PROJECTPATH }}
-    
     - name: Restore
       run: dotnet restore "$PROJECTPATH"
       env:
@@ -91,3 +83,13 @@ jobs:
         name: "${{ steps.publish_nuget.outputs.PACKAGE_NAME }}"
         path: "${{ steps.publish_nuget.outputs.PACKAGE_PATH }}"
       if: steps.publish_nuget.outputs.PACKAGE_NAME != ''
+    
+    - name: Outcome
+      run: |
+        if "$INPUT_NAME" != ""; then
+            echo "Package $INPUT_NAME published and tagged with $INPUT_VERSION ."
+        else
+            echo "Package publishing skipped."
+      with:
+        NAME: "${{ steps.publish_nuget.outputs.PACKAGE_NAME }}"
+        VERSION: "${{ steps.publish_nuget.outputs.VERSION }}"
