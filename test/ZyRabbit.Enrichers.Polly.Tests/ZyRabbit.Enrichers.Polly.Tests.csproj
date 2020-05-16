@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyTitle>ZyRabbit.Enrichers.Polly.Tests</AssemblyTitle>
     <Product>ZyRabbit.Enrichers.Polly.Tests</Product>
-    <Copyright>Copyright ©  2017</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
