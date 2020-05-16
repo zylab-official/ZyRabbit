@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <Authors>pardahlman</Authors>
     <AssemblyTitle>ZyRabbit.Enrichers.ZeroFormatter</AssemblyTitle>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <PackageId>ZyRabbit.Enrichers.Protobuf</PackageId>
     <PackageTags>rabbitmq;zyrabbit;protobuf</PackageTags>
-    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <Description>Serialize messages with Protobuf in ZyRabbit</Description>
   </PropertyGroup>
 

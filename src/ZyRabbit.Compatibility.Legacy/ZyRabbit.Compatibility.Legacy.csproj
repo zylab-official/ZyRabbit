@@ -3,14 +3,13 @@
   <PropertyGroup>
     <Description>Bus Client that is API compatible with 1.x.</Description>
     <AssemblyTitle>ZyRabbit.Compatibility.Legacy</AssemblyTitle>
-    <Version>2.0.0-alpha</Version>
+	  <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>pardahlman</Authors>
-    <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit.Compatibility.Legacy</AssemblyName>
     <PackageId>ZyRabbit.Compatibility.Legacy</PackageId>
     <PackageTags>rabbitmq;zyrabbit;compatibility</PackageTags>
-    <PackageIconUrl>http://pardahlman.se/raw/icon.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/pardahlman/ZyRabbit</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/zylab-official/ZyRabbit</PackageProjectUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

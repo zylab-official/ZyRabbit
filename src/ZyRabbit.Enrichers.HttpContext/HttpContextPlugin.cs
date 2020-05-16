@@ -12,7 +12,7 @@ namespace ZyRabbit
 				.Use<NetFxHttpContextMiddleware>()
 			);
 #endif
-#if NETSTANDARD1_6
+#if NETSTANDARD2_0
 			builder.Register(
 				p => p.Use<AspNetCoreHttpContextMiddleware>(),
 				p => p.AddSingleton<Microsoft.AspNetCore.Http.IHttpContextAccessor, Microsoft.AspNetCore.Http.HttpContextAccessor>()
