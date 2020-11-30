@@ -24,7 +24,7 @@ namespace ZyRabbit.Enrichers.Polly.Tests.Services
 				.Returns(connection.Object);
 			connectionFactory
 				.SetupSequence(c => c.CreateConnection(
-						It.IsAny<List<string>>()
+						It.IsAny<List<string>>(), It.IsAny<string>()
 					))
 				.Throws(new BrokerUnreachableException(new Exception()))
 				.Throws(new BrokerUnreachableException(new Exception()))
@@ -50,7 +50,7 @@ namespace ZyRabbit.Enrichers.Polly.Tests.Services
 		}
 
 		[Fact]
-		public async Task Should_Use_Create_Channel_Policy_When_Creaing_Channels()
+		public async Task Should_Use_Create_Channel_Policy_When_Creating_Channels()
 		{
 			/* Setup */
 			var channel = new Mock<IModel>();
@@ -61,7 +61,7 @@ namespace ZyRabbit.Enrichers.Polly.Tests.Services
 				.Returns(connection.Object);
 			connectionFactory
 				.Setup(c => c.CreateConnection(
-					It.IsAny<List<string>>()
+					It.IsAny<List<string>>(), It.IsAny<string>()
 				))
 				.Returns(connection.Object);
 			connection

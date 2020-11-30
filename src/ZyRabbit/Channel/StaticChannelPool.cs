@@ -46,7 +46,7 @@ namespace ZyRabbit.Channel
 
 			if (!Monitor.TryEnter(_workLock))
 			{
-				_logger.Debug("Unable to aquire work lock for service channels.");
+				_logger.Debug("Unable to acquire work lock for service channels.");
 				return;
 			}
 
@@ -61,6 +61,7 @@ namespace ZyRabbit.Channel
 						_logger.Debug("Unable to server channels. Pool empty.");
 						return;
 					}
+
 					if (_current.Value.IsClosed)
 					{
 						Pool.Remove(_current);
@@ -68,18 +69,26 @@ namespace ZyRabbit.Channel
 						{
 							continue;
 						}
+
 						if (Recoverables.Count == 0)
 						{
 							throw new ChannelAvailabilityException("No open channels in pool and no recoverable channels");
 						}
+
 						_logger.Info("No open channels in pool, but {recoveryCount} waiting for recovery", Recoverables.Count);
 						return;
 					}
+
 					if (ChannelRequestQueue.TryDequeue(out var cTsc))
 					{
 						cTsc.TrySetResult(_current.Value);
 					}
 				} while (!ChannelRequestQueue.IsEmpty);
+			}
+			catch (ChannelAvailabilityException e)
+			{
+				_logger.Info(e.Message);
+				throw;
 			}
 			catch (Exception e)
 			{
