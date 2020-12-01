@@ -16,11 +16,11 @@ namespace ZyRabbit.Tests.Channel
 		public async Task Should_Throw_Exception_If_Connection_Is_Closed_By_Application()
 		{
 			/* Setup */
-			var connectionFactroy = new Mock<IConnectionFactory>();
+			var connectionFactory = new Mock<IConnectionFactory>();
 			var connection = new Mock<IConnection>();
-			connectionFactroy
+			connectionFactory
 				.Setup(c => c.CreateConnection(
-					It.IsAny<List<string>>()))
+					It.IsAny<List<string>>(), It.IsAny<string>()))
 				.Returns(connection.Object);
 			connection
 				.Setup(c => c.IsOpen)
@@ -28,7 +28,7 @@ namespace ZyRabbit.Tests.Channel
 			connection
 				.Setup(c => c.CloseReason)
 				.Returns(new ShutdownEventArgs(ShutdownInitiator.Application, 0, string.Empty));
-			var channelFactory = new ChannelFactory(connectionFactroy.Object, ZyRabbitConfiguration.Local);
+			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local);
 
 			/* Test */
 			/* Assert */
@@ -47,11 +47,11 @@ namespace ZyRabbit.Tests.Channel
 		public async Task Should_Throw_Exception_If_Connection_Is_Closed_By_Lib_But_Is_Not_Recoverable()
 		{
 			/* Setup */
-			var connectionFactroy = new Mock<IConnectionFactory>();
+			var connectionFactory = new Mock<IConnectionFactory>();
 			var connection = new Mock<IConnection>();
-			connectionFactroy
+			connectionFactory
 				.Setup(c => c.CreateConnection(
-					It.IsAny<List<string>>()))
+					It.IsAny<List<string>>(), It.IsAny<string>()))
 				.Returns(connection.Object);
 			connection
 				.Setup(c => c.IsOpen)
@@ -59,7 +59,7 @@ namespace ZyRabbit.Tests.Channel
 			connection
 				.Setup(c => c.CloseReason)
 				.Returns(new ShutdownEventArgs(ShutdownInitiator.Library, 0, string.Empty));
-			var channelFactory = new ChannelFactory(connectionFactroy.Object, ZyRabbitConfiguration.Local);
+			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local);
 
 			/* Test */
 			/* Assert */
@@ -79,11 +79,11 @@ namespace ZyRabbit.Tests.Channel
 		{
 			/* Setup */
 			var channel = new Mock<IModel>();
-			var connectionFactroy = new Mock<IConnectionFactory>();
+			var connectionFactory = new Mock<IConnectionFactory>();
 			var connection = new Mock<IConnection>();
-			connectionFactroy
+			connectionFactory
 				.Setup(c => c.CreateConnection(
-					It.IsAny<List<string>>()))
+					It.IsAny<List<string>>(), It.IsAny<string>()))
 				.Returns(connection.Object);
 			connection
 				.Setup(c => c.CreateModel())
@@ -91,7 +91,7 @@ namespace ZyRabbit.Tests.Channel
 			connection
 				.Setup(c => c.IsOpen)
 				.Returns(true);
-			var channelFactory = new ChannelFactory(connectionFactroy.Object, ZyRabbitConfiguration.Local);
+			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local);
 
 			/* Test */
 			var retrievedChannel = await channelFactory.CreateChannelAsync();
@@ -110,7 +110,7 @@ namespace ZyRabbit.Tests.Channel
 			var recoverable = connection.As<IRecoverable>();
 			connectionFactroy
 				.Setup(c => c.CreateConnection(
-					It.IsAny<List<string>>()))
+					It.IsAny<List<string>>(), It.IsAny<string>()))
 				.Returns(connection.Object);
 			connection
 				.Setup(c => c.CreateModel())

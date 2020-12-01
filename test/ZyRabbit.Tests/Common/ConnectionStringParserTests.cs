@@ -83,10 +83,10 @@ namespace ZyRabbit.Tests.Common
 			Assert.Equal(expected: TimeSpan.FromSeconds(10), actual: config.RequestTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(20), actual: config.PublishConfirmTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(30), actual: config.RecoveryInterval);
-			Assert.Equal(expected: false, actual: config.AutoCloseConnection);
-			Assert.Equal(expected: false, actual: config.PersistentDeliveryMode);
-			Assert.Equal(expected: false, actual: config.AutomaticRecovery);
-			Assert.Equal(expected: false, actual: config.TopologyRecovery);
+			Assert.False(config.AutoCloseConnection);
+			Assert.False(config.PersistentDeliveryMode);
+			Assert.False(config.AutomaticRecovery);
+			Assert.False(config.TopologyRecovery);
 		}
 
 		[Fact]
@@ -204,10 +204,10 @@ namespace ZyRabbit.Tests.Common
 			Assert.Equal(expected: TimeSpan.FromSeconds(10), actual: config.RequestTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(20), actual: config.PublishConfirmTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(30), actual: config.RecoveryInterval);
-			Assert.Equal(expected: false, actual: config.AutoCloseConnection);
-			Assert.Equal(expected: false, actual: config.PersistentDeliveryMode);
-			Assert.Equal(expected: false, actual: config.AutomaticRecovery);
-			Assert.Equal(expected: false, actual: config.TopologyRecovery);
+			Assert.False(config.AutoCloseConnection);
+			Assert.False(config.PersistentDeliveryMode);
+			Assert.False(config.AutomaticRecovery);
+			Assert.False(config.TopologyRecovery);
 		}
 
 		[Fact]
@@ -236,10 +236,10 @@ namespace ZyRabbit.Tests.Common
 			Assert.Equal(expected: TimeSpan.FromSeconds(10), actual: config.RequestTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(20), actual: config.PublishConfirmTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(30), actual: config.RecoveryInterval);
-			Assert.Equal(expected: false, actual: config.AutoCloseConnection);
-			Assert.Equal(expected: false, actual: config.PersistentDeliveryMode);
-			Assert.Equal(expected: false, actual: config.AutomaticRecovery);
-			Assert.Equal(expected: false, actual: config.TopologyRecovery);
+			Assert.False(config.AutoCloseConnection);
+			Assert.False(config.PersistentDeliveryMode);
+			Assert.False(config.AutomaticRecovery);
+			Assert.False(config.TopologyRecovery);
 		}
 
 		[Fact]
@@ -268,10 +268,10 @@ namespace ZyRabbit.Tests.Common
 			Assert.Equal(expected: TimeSpan.FromSeconds(10), actual: config.RequestTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(20), actual: config.PublishConfirmTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(30), actual: config.RecoveryInterval);
-			Assert.Equal(expected: false, actual: config.AutoCloseConnection);
-			Assert.Equal(expected: false, actual: config.PersistentDeliveryMode);
-			Assert.Equal(expected: false, actual: config.AutomaticRecovery);
-			Assert.Equal(expected: false, actual: config.TopologyRecovery);
+			Assert.False(config.AutoCloseConnection);
+			Assert.False(config.PersistentDeliveryMode);
+			Assert.False(config.AutomaticRecovery);
+			Assert.False(config.TopologyRecovery);
 		}
 
 		[Fact]
@@ -300,10 +300,10 @@ namespace ZyRabbit.Tests.Common
 			Assert.Equal(expected: TimeSpan.FromSeconds(10), actual: config.RequestTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(20), actual: config.PublishConfirmTimeout);
 			Assert.Equal(expected: TimeSpan.FromSeconds(30), actual: config.RecoveryInterval);
-			Assert.Equal(expected: false, actual: config.AutoCloseConnection);
-			Assert.Equal(expected: false, actual: config.PersistentDeliveryMode);
-			Assert.Equal(expected: false, actual: config.AutomaticRecovery);
-			Assert.Equal(expected: false, actual: config.TopologyRecovery);
+			Assert.False(config.AutoCloseConnection);
+			Assert.False(config.PersistentDeliveryMode);
+			Assert.False(config.AutomaticRecovery);
+			Assert.False(config.TopologyRecovery);
 		}
 
 		[Fact]
@@ -325,7 +325,7 @@ namespace ZyRabbit.Tests.Common
 
 			/* Assert */
 			Assert.NotNull(exception);
-			Assert.IsType(typeof(FormatException), exception);
+			Assert.IsType<FormatException>(exception);
 			Assert.Equal(expected: "The supplied port 'port' in the connection string is not a number", actual: exception.Message);
 		}
 
@@ -348,7 +348,7 @@ namespace ZyRabbit.Tests.Common
 
 			/* Assert */
 			Assert.NotNull(exception);
-			Assert.IsType(typeof(ArgumentException), exception);
+			Assert.IsType<ArgumentException>(exception);
 			Assert.Equal(expected: "No configuration property named 'badproperty'", actual: exception.Message);
 		}
 
