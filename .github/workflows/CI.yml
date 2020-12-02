@@ -1,6 +1,7 @@
 name: ZyRabbitCD
 
 on:
+  workflow_dispatch:
   push:
     branches: 
      - master
@@ -26,7 +27,7 @@ jobs:
     - name: Set project path
       run: |
         export PROJECT="./src/ZyRabbit/ZyRabbit.csproj"
-        echo "::set-env name=PROJECTPATH::$PROJECT"
+        echo "PROJECTPATH=$PROJECT" >> $GITHUB_ENV
     
     - name: Restore
       run: dotnet restore "$PROJECTPATH"
