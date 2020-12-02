@@ -5,7 +5,7 @@ on:
   push:
     branches: 
      - master
-     - actions
+     - bugfix/FixEnvVariables
   pull_request:
     branches: 
      - master
