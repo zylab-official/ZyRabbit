@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7FCF8D3B-BA55-4C47-AC60-5CEF75418BEB}"
 EndProject
@@ -33,8 +33,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZyRabbit.Operations.Publish", "src\ZyRabbit.Operations.Publish\ZyRabbit.Operations.Publish.csproj", "{569B0E27-FA00-41EC-82AD-B60C121D5799}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZyRabbit.Operations.Subscribe", "src\ZyRabbit.Operations.Subscribe\ZyRabbit.Operations.Subscribe.csproj", "{09428754-16D9-457E-A9C4-8C62D745D5CB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZyRabbit.Compatibility.Legacy", "src\ZyRabbit.Compatibility.Legacy\ZyRabbit.Compatibility.Legacy.csproj", "{D15DC347-BD32-4B1F-9ED3-958851E81CDF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZyRabbit.Enrichers.MessageContext.Subscribe", "src\ZyRabbit.Enrichers.MessageContext.Subscribe\ZyRabbit.Enrichers.MessageContext.Subscribe.csproj", "{608C761A-CC99-40A6-B474-C6783C7E47E8}"
 EndProject
@@ -124,10 +122,6 @@ Global
 		{09428754-16D9-457E-A9C4-8C62D745D5CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09428754-16D9-457E-A9C4-8C62D745D5CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09428754-16D9-457E-A9C4-8C62D745D5CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D15DC347-BD32-4B1F-9ED3-958851E81CDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D15DC347-BD32-4B1F-9ED3-958851E81CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D15DC347-BD32-4B1F-9ED3-958851E81CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D15DC347-BD32-4B1F-9ED3-958851E81CDF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{608C761A-CC99-40A6-B474-C6783C7E47E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{608C761A-CC99-40A6-B474-C6783C7E47E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{608C761A-CC99-40A6-B474-C6783C7E47E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -227,7 +221,6 @@ Global
 		{98C9E1D2-CBD2-4058-BE9F-BB5F0F3795B4} = {2F91E22A-AEBA-4BEF-9A03-C8232830F697}
 		{569B0E27-FA00-41EC-82AD-B60C121D5799} = {7FCF8D3B-BA55-4C47-AC60-5CEF75418BEB}
 		{09428754-16D9-457E-A9C4-8C62D745D5CB} = {7FCF8D3B-BA55-4C47-AC60-5CEF75418BEB}
-		{D15DC347-BD32-4B1F-9ED3-958851E81CDF} = {7FCF8D3B-BA55-4C47-AC60-5CEF75418BEB}
 		{608C761A-CC99-40A6-B474-C6783C7E47E8} = {7FCF8D3B-BA55-4C47-AC60-5CEF75418BEB}
 		{E970BC44-5D50-480B-8477-0B82315AB99A} = {7FCF8D3B-BA55-4C47-AC60-5CEF75418BEB}
 		{9B40CE36-B5B1-4D33-B027-5A3D80554791} = {7FCF8D3B-BA55-4C47-AC60-5CEF75418BEB}

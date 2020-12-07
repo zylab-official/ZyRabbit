@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Authors>par.dahlman</Authors>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <AssemblyName>ZyRabbit.IntegrationTests</AssemblyName>
     <PackageId>ZyRabbit.IntegrationTests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -18,7 +18,6 @@
     <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.ZeroFormatter\ZyRabbit.Enrichers.ZeroFormatter.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Tools\ZyRabbit.Operations.Tools.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit\ZyRabbit.csproj" />
-    <ProjectReference Include="..\..\src\ZyRabbit.Compatibility.Legacy\ZyRabbit.Compatibility.Legacy.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Get\ZyRabbit.Operations.Get.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Publish\ZyRabbit.Operations.Publish.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Subscribe\ZyRabbit.Operations.Subscribe.csproj" />
@@ -38,16 +37,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170106-08" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
     <PackageReference Include="Moq" Version="4.7.137" />
     <PackageReference Include="xunit" Version="2.3.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="1.0.2" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
   <ItemGroup>

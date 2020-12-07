@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 using ZyRabbit.AspNet.Sample.Controllers;
 using ZyRabbit.Configuration;
 using ZyRabbit.DependencyInjection.ServiceCollection;
@@ -13,65 +13,49 @@ using ZyRabbit.Enrichers.GlobalExecutionId;
 using ZyRabbit.Enrichers.HttpContext;
 using ZyRabbit.Enrichers.MessageContext;
 using ZyRabbit.Instantiation;
-using Serilog;
-using Serilog.Events;
-using ILogger = Serilog.ILogger;
 
 namespace ZyRabbit.AspNet.Sample
 {
 	public class Startup
 	{
-		private readonly string _rootPath;
-
-		public Startup(IHostingEnvironment env)
+		public Startup(IConfiguration configuration)
 		{
-			_rootPath = env.ContentRootPath;
-			var builder = new ConfigurationBuilder()
-				.SetBasePath(_rootPath)
-				.AddJsonFile("appsettings.json")
-				.AddEnvironmentVariables();
-			Configuration = builder.Build();
+			Configuration = configuration;
 		}
 
-		public IConfigurationRoot Configuration { get; }
+		public IConfiguration Configuration { get; }
 
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services
 				.AddZyRabbit(new ZyRabbitOptions
-					{
-						ClientConfiguration = GetZyRabbitConfiguration(),
-						Plugins = p => p
-							.UseStateMachine()
-							.UseGlobalExecutionId()
-							.UseHttpContext()
-							.UseMessageContext(c =>
-							{
-								return new MessageContext
-								{
-									Source = c.GetHttpContext().Request.GetDisplayUrl()
-								};
-							})
-					})
-				.AddMvc();
+				{
+					ClientConfiguration = GetZyRabbitConfiguration(),
+					Plugins = p => p
+						.UseStateMachine()
+						.UseGlobalExecutionId()
+						.UseHttpContext()
+						.UseMessageContext(c => new MessageContext
+						{
+							Source = c.GetHttpContext().Request.GetDisplayUrl()
+						})
+				})
+				.AddControllers();
 		}
 
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			Log.Logger = GetConfiguredSerilogger();
-			loggerFactory
-				.AddSerilog()
-				.AddConsole(Configuration.GetSection("Logging"));
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
 
-			app.UseMvc();
-		}
-
-		private ILogger GetConfiguredSerilogger()
-		{
-			return new LoggerConfiguration()
-				.WriteTo.File($"{_rootPath}/Logs/serilog.log", LogEventLevel.Debug)
-				.WriteTo.LiterateConsole()
-				.CreateLogger();
+			app.UseHttpsRedirection();
+			app.UseRouting();
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+			});
 		}
 
 		private ZyRabbitConfiguration GetZyRabbitConfiguration()
@@ -79,7 +63,7 @@ namespace ZyRabbit.AspNet.Sample
 			var section = Configuration.GetSection("ZyRabbit");
 			if (!section.GetChildren().Any())
 			{
-				throw new ArgumentException($"Unable to configuration section 'ZyRabbit'. Make sure it exists in the provided configuration");
+				throw new ArgumentException("Unable to configuration section 'ZyRabbit'. Make sure it exists in the provided configuration");
 			}
 			return section.Get<ZyRabbitConfiguration>();
 		}

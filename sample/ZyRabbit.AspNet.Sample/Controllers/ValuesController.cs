@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ZyRabbit.Enrichers.MessageContext.Context;
 using ZyRabbit.Messages.Sample;
 using ZyRabbit.Operations.MessageSequence;
 
@@ -16,10 +14,10 @@ namespace ZyRabbit.AspNet.Sample.Controllers
 		private readonly Random _random;
 		private readonly ILogger<ValuesController> _logger;
 
-		public ValuesController(IBusClient legacyBusClient, ILoggerFactory loggerFactory)
+		public ValuesController(IBusClient legacyBusClient, ILogger<ValuesController> logger)
 		{
 			_busClient = legacyBusClient;
-			_logger = loggerFactory.CreateLogger<ValuesController>();
+			_logger = logger;
 			_random = new Random();
 		}
 

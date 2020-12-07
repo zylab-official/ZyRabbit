@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +9,6 @@ using ZyRabbit.Enrichers.MessageContext;
 using ZyRabbit.Enrichers.MessageContext.Context;
 using ZyRabbit.Instantiation;
 using ZyRabbit.Messages.Sample;
-using Serilog;
 
 namespace ZyRabbit.ConsoleApp.Sample
 {
@@ -16,22 +16,13 @@ namespace ZyRabbit.ConsoleApp.Sample
 	{
 		private static IBusClient _client;
 
-		public static void Main(string[] args)
+		public static async Task Main()
 		{
-			RunAsync().GetAwaiter().GetResult();
-		}
-
-		public static async Task RunAsync()
-		{
-			Log.Logger = new LoggerConfiguration()
-				.WriteTo.LiterateConsole()
-				.CreateLogger();
-
 			_client = ZyRabbitFactory.CreateSingleton(new ZyRabbitOptions
 			{
 				ClientConfiguration = new ConfigurationBuilder()
 					.SetBasePath(Directory.GetCurrentDirectory())
-					.AddJsonFile("zyrabbit.json")
+					.AddJsonFile("appsettings.json")
 					.Build()
 					.Get<ZyRabbitConfiguration>(),
 				Plugins = p => p
@@ -39,8 +30,9 @@ namespace ZyRabbit.ConsoleApp.Sample
 					.UseMessageContext<MessageContext>()
 			});
 
-			await _client.SubscribeAsync<ValuesRequested, MessageContext>((requested, ctx) => ServerValuesAsync(requested, ctx));
-			await _client.RespondAsync<ValueRequest, ValueResponse>(request => SendValuesThoughRpcAsync(request));
+			await _client.SubscribeAsync<ValuesRequested, MessageContext>(ServerValuesAsync);
+			await _client.RespondAsync<ValueRequest, ValueResponse>(SendValuesThoughRpcAsync);
+			Console.ReadKey(true);
 		}
 
 		private static Task<ValueResponse> SendValuesThoughRpcAsync(ValueRequest request)
