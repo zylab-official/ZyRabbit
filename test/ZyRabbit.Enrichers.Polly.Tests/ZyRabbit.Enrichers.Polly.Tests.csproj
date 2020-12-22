@@ -1,16 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{4B4C5936-D61E-4FD8-AEB7-154CEAF84E15}</ProjectGuid>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <AssemblyTitle>ZyRabbit.Enrichers.Polly.Tests</AssemblyTitle>
-    <Product>ZyRabbit.Enrichers.Polly.Tests</Product>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 	<ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.2.1" />
