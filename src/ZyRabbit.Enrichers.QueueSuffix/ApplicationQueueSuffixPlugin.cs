@@ -5,24 +5,22 @@ using ZyRabbit.Instantiation;
 
 namespace ZyRabbit.Enrichers.QueueSuffix
 {
-	public static  class ApplicationQueueSuffixPlugin
+	public static class ApplicationQueueSuffixPlugin
 	{
 		private const string IisWorkerProcessName = "w3wp";
 		private static readonly Regex DllRegex = new Regex(@"(?<ApplicationName>[^\\]*).dll", RegexOptions.Compiled);
 		private static readonly Regex ConsoleOrServiceRegex = new Regex(@"(?<ApplicationName>[^\\]*).exe", RegexOptions.Compiled);
-		private static readonly Regex IisHostedAppRegexVer1 = new Regex(@"-ap\s\\""(?<ApplicationName>[^\\]+)");
-		private static readonly Regex IisHostedAppRegexVer2 = new Regex(@"\\\\apppools\\\\(?<ApplicationName>[^\\]+)");
+		private static readonly Regex IisHostedAppRegexVer1 = new Regex(@"-ap\s\\""(?<ApplicationName>[^\\]+)", RegexOptions.Compiled);
+		private static readonly Regex IisHostedAppRegexVer2 = new Regex(@"\\\\apppools\\\\(?<ApplicationName>[^\\]+)", RegexOptions.Compiled);
 
 		public static IClientBuilder UseApplicationQueueSuffix(this IClientBuilder builder)
 		{
 			var commandLine =  Environment.GetCommandLineArgs();
-			var match = ConsoleOrServiceRegex.Match(commandLine.FirstOrDefault() ?? string.Empty);
+			
+			var executableFileName = commandLine.FirstOrDefault() ?? string.Empty;
+			var match = ConsoleOrServiceRegex.Match(executableFileName);
 			var applicationName = string.Empty;
-
-			if (commandLine == null)
-			{
-				return builder;
-			}
+			
 			if (match.Success && match.Groups["ApplicationName"].Value != IisWorkerProcessName)
 			{
 				applicationName = match.Groups["ApplicationName"].Value;
@@ -31,24 +29,24 @@ namespace ZyRabbit.Enrichers.QueueSuffix
 			}
 			else
 			{
-				match = IisHostedAppRegexVer1.Match(commandLine.FirstOrDefault() ?? string.Empty);
+				match = IisHostedAppRegexVer1.Match(executableFileName);
 				if (match.Success)
 				{
 					applicationName = match.Groups["ApplicationName"].Value;
 				}
 				else
 				{
-					match = IisHostedAppRegexVer2.Match(commandLine.FirstOrDefault() ?? string.Empty);
+					match = IisHostedAppRegexVer2.Match(executableFileName);
 					if (match.Success)
 					{
 						applicationName = match.Groups["ApplicationName"].Value;
 					}
 					else
 					{
-						var index = commandLine.Length > 1 ? 1 : 0;
-						if (DllRegex.IsMatch(commandLine[index]))
+						match = DllRegex.Match(executableFileName);
+						if (match.Success)
 						{
-							applicationName = DllRegex.Match(commandLine[index]).Groups["ApplicationName"].Value;
+							applicationName = match.Groups["ApplicationName"].Value;
 						}
 					}
 				}

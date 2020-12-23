@@ -3,25 +3,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 	<ItemGroup>
-    <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Moq" Version="4.7.137" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+		<PackageReference Include="Castle.Core" Version="4.4.1" />
+    <PackageReference Include="Moq" Version="4.15.2" />
     <PackageReference Include="Polly" Version="5.3.1" />
     <PackageReference Include="RabbitMQ.Client" Version="5.2.0" />
-    <PackageReference Include="xunit" Version="2.3.0" />
-    <PackageReference Include="xunit.abstractions" Version="2.0.1" />
-    <PackageReference Include="xunit.analyzers" Version="0.7.0" />
-    <PackageReference Include="xunit.assert" Version="2.3.0" />
-    <PackageReference Include="xunit.core" Version="2.3.0" />
-    <PackageReference Include="xunit.extensibility.core" Version="2.3.0" />
-    <PackageReference Include="xunit.extensibility.execution" Version="2.3.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0">
+		<PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Include="System.Configuration" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.Polly\ZyRabbit.Enrichers.Polly.csproj" />

@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using ZyRabbit.Enrichers.QueueSuffix;
 using ZyRabbit.Instantiation;
 using ZyRabbit.IntegrationTests.TestMessages;
-using ZyRabbit.Pipe;
 using Xunit;
 
 namespace ZyRabbit.IntegrationTests.Enrichers
