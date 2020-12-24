@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 using ZyRabbit.Instantiation;
 
@@ -17,7 +16,7 @@ namespace ZyRabbit.Enrichers.QueueSuffix
 		{
 			var commandLine =  Environment.GetCommandLineArgs();
 			
-			var executableFileName = commandLine.FirstOrDefault() ?? string.Empty;
+			var executableFileName = commandLine[0];
 			var match = ConsoleOrServiceRegex.Match(executableFileName);
 			var applicationName = string.Empty;
 			

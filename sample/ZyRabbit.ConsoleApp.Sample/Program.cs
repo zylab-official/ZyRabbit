@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using ZyRabbit.Configuration;
@@ -16,21 +15,15 @@ namespace ZyRabbit.ConsoleApp.Sample
 	{
 		private static IBusClient _client;
 
-		public static void Main(string[] args)
-		{
-			RunAsync().GetAwaiter().GetResult();
-		}
-
-		public static async Task RunAsync()
+		public static async Task Main()
 		{
 			Log.Logger = new LoggerConfiguration()
-				.WriteTo.LiterateConsole()
+				.WriteTo.Console()
 				.CreateLogger();
 
 			_client = ZyRabbitFactory.CreateSingleton(new ZyRabbitOptions
 			{
 				ClientConfiguration = new ConfigurationBuilder()
-					.SetBasePath(Directory.GetCurrentDirectory())
 					.AddJsonFile("zyrabbit.json")
 					.Build()
 					.Get<ZyRabbitConfiguration>(),
@@ -41,6 +34,8 @@ namespace ZyRabbit.ConsoleApp.Sample
 
 			await _client.SubscribeAsync<ValuesRequested, MessageContext>((requested, ctx) => ServerValuesAsync(requested, ctx));
 			await _client.RespondAsync<ValueRequest, ValueResponse>(request => SendValuesThoughRpcAsync(request));
+
+			System.Console.ReadKey();
 		}
 
 		private static Task<ValueResponse> SendValuesThoughRpcAsync(ValueRequest request)
