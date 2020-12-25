@@ -9,14 +9,11 @@ namespace ZyRabbit.PerformanceTest
 	public class MessageContextBenchmarks
 	{
 		private IBusClient _withoutContext;
-		private Task _completedTask;
 		private MessageA _messageA;
 		private IBusClient _withContext;
 		private MessageB _messageB;
-		public event EventHandler MessageReceived;
-		public delegate void MessageReceivedEventHandler(EventHandler e);
 
-		[Setup]
+		[GlobalSetup]
 		public void Setup()
 		{
 			_withoutContext = ZyRabbitFactory.CreateSingleton();
@@ -24,22 +21,19 @@ namespace ZyRabbit.PerformanceTest
 			{
 				Plugins = p => p.UseMessageContext<MessageContext>()
 			});
-			_completedTask = Task.FromResult(0);
 			_messageA = new MessageA();
 			_messageB = new MessageB();
 			_withoutContext.SubscribeAsync<MessageA>(message =>
 			{
-				MessageReceived(message, EventArgs.Empty);
-				return _completedTask;
+				return Task.CompletedTask;
 			});
 			_withContext.SubscribeAsync<MessageB, MessageContext>((message, context) =>
 			{
-				MessageReceived(message, EventArgs.Empty);
-				return _completedTask;
+				return Task.CompletedTask;
 			});
 		}
 
-		[Cleanup]
+		[GlobalCleanup]
 		public void Cleanup()
 		{
 			_withoutContext.DeleteQueueAsync<MessageA>();
@@ -51,29 +45,14 @@ namespace ZyRabbit.PerformanceTest
 		[Benchmark]
 		public async Task MessageContext_FromFactory()
 		{
-			var msgTsc = new TaskCompletionSource<Message>();
-
-			EventHandler onMessageReceived = (sender, args) => { msgTsc.TrySetResult(sender as Message); };
-			MessageReceived += onMessageReceived;
-
-			_withContext.PublishAsync(_messageB);
-			await msgTsc.Task;
-			MessageReceived -= onMessageReceived;
+			await _withContext.PublishAsync(_messageB);
 		}
 
 		[Benchmark]
 		public async Task MessageContext_None()
 		{
-			var msgTsc = new TaskCompletionSource<Message>();
-
-			EventHandler onMessageReceived = (sender, args) => { msgTsc.TrySetResult(sender as Message); };
-			MessageReceived += onMessageReceived;
-
-			_withoutContext.PublishAsync(_messageA);
-			await msgTsc.Task;
-			MessageReceived -= onMessageReceived;
+			await _withoutContext.PublishAsync(_messageA);
 		}
-
 
 		public class MessageA { }
 		public class MessageB { }

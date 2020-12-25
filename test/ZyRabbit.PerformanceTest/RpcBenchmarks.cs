@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using ZyRabbit.Instantiation;
-using ZyRabbit.Operations.Request.Core;
-using ZyRabbit.Operations.Respond.Core;
 
 namespace ZyRabbit.PerformanceTest
 {
@@ -12,18 +10,14 @@ namespace ZyRabbit.PerformanceTest
 		private IBusClient _busClient;
 		private Request _request;
 		private Respond _respond;
-		public event EventHandler MessageReceived;
-		public delegate void MessageReceivedEventHandler(EventHandler e);
 
-		[Setup]
+		[GlobalSetup]
 		public void Setup()
 		{
 			_busClient = ZyRabbitFactory.CreateSingleton();
 			_request = new Request();
 			_respond = new Respond();
-			_busClient.RespondAsync<Request,Respond>(message =>
-				Task.FromResult(_respond)
-			);
+			_busClient.RespondAsync<Request,Respond>(message =>	Task.FromResult(_respond));
 			_busClient.RespondAsync<Request, Respond>(message =>
 				Task.FromResult(_respond),
 				ctx => ctx.UseRespondConfiguration(cfg => cfg
@@ -38,7 +32,7 @@ namespace ZyRabbit.PerformanceTest
 			);
 		}
 
-		[Cleanup]
+		[GlobalCleanup]
 		public void Cleanup()
 		{
 			_busClient.DeleteQueueAsync<Request>();
