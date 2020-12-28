@@ -1,6 +1,5 @@
 ﻿using System;
 using Autofac;
-using ZyRabbit.DependencyInjection;
 
 namespace ZyRabbit.DependencyInjection.Autofac
 {
@@ -55,6 +54,24 @@ namespace ZyRabbit.DependencyInjection.Autofac
 				.RegisterType<TImplementation>()
 				.As<TService>()
 				.SingleInstance();
+			return this;
+		}
+
+		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, object> instanceCreator)
+		{
+			_builder.RegisterGeneric((ctxt, types, parameters) =>
+			{
+				return instanceCreator(new ComponentContextAdapter(ctxt));
+			}).As(type).InstancePerDependency();
+			return this;
+		}
+
+		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, object> instanceCreator)
+		{
+			_builder.RegisterGeneric((ctxt, types, parameters) =>
+			{
+				return instanceCreator(new ComponentContextAdapter(ctxt));
+			}).As(type).SingleInstance();
 			return this;
 		}
 	}

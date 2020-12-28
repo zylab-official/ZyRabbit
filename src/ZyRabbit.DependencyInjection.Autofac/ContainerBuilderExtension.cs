@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Autofac.Features.ResolveAnything;
-using ZyRabbit.DependencyInjection;
 using ZyRabbit.Instantiation;
 
 namespace ZyRabbit.DependencyInjection.Autofac

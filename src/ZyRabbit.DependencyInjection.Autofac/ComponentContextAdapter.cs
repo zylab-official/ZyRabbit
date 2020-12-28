@@ -2,8 +2,6 @@
 using System.Linq;
 using Autofac;
 using Autofac.Core;
-using Autofac.Core.Registration;
-using ZyRabbit.DependencyInjection;
 
 namespace ZyRabbit.DependencyInjection.Autofac
 {

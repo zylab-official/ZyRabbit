@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
+using System.Linq;
 using ZyRabbit.Channel;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Common;
@@ -86,7 +88,12 @@ namespace ZyRabbit.DependencyInjection
 				.AddTransient<IInstanceFactory>(resolver => new InstanceFactory(resolver))
 				.AddSingleton<IPipeContextFactory, PipeContextFactory>()
 				.AddTransient<IExtendedPipeBuilder, PipeBuilder>(resolver => new PipeBuilder(resolver))
-				.AddSingleton<IPipeBuilderFactory>(provider => new PipeBuilderFactory(provider));
+				.AddSingleton<IPipeBuilderFactory>(provider => new PipeBuilderFactory(provider))
+				.AddSingleton<ILoggerFactory, NullLoggerFactory>()
+				.AddSingleton(typeof(ILogger<>), resolver => {
+					return resolver.GetService();
+				})
+				.AddSingleton<ILogger, NullLogger>();
 
 			var clientBuilder = new ClientBuilder();
 			options?.Plugins?.Invoke(clientBuilder);

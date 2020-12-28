@@ -3,7 +3,6 @@ using System.Linq;
 using Ninject;
 using Ninject.Activation;
 using Ninject.Parameters;
-using ZyRabbit.DependencyInjection;
 
 namespace ZyRabbit.DependencyInjection.Ninject
 {

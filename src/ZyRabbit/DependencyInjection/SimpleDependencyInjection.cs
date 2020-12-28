@@ -64,7 +64,7 @@ namespace ZyRabbit.DependencyInjection
 			throw new InvalidOperationException("No registration for " + serviceType);
 		}
 
-		public bool TryGetService(Type serviceType, out object service, params object[] additional)
+		private bool TryGetService(Type serviceType, out object service, params object[] additional)
 		{
 			Func<IDependencyResolver, object> creator;
 			if (_registrations.TryGetValue(serviceType, out creator))
@@ -72,11 +72,26 @@ namespace ZyRabbit.DependencyInjection
 				service = creator(this);
 				return true;
 			}
-			if (!serviceType.GetTypeInfo().IsAbstract)
+
+			var typeInfo = serviceType.GetTypeInfo();
+			if (typeInfo.IsAbstract && typeInfo.IsConstructedGenericType)
+			{
+				foreach (var implementedInterface in typeInfo.ImplementedInterfaces)
+				{
+					if (_registrations.TryGetValue(serviceType, out creator))
+					{
+						service = creator(this);
+						return true;
+					}
+				}
+			}
+
+			if (!typeInfo.IsAbstract)
 			{
 				service = CreateInstance(serviceType, additional);
 				return true;
 			}
+
 			service = null;
 			return false;
 		}
@@ -107,6 +122,23 @@ namespace ZyRabbit.DependencyInjection
 				})
 				.ToArray();
 			return ctor.Invoke(dependencies);
+		}
+
+		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, object> instanceCreator)
+		{
+			if (_registrations.ContainsKey(type))
+			{
+				_registrations.Remove(type);
+			}
+			_registrations.Add(type, instanceCreator);
+			return this;
+		}
+
+		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, object> instanceCreator)
+		{
+			var lazy = new Lazy<object>(() => instanceCreator(this));
+			AddTransient(type, resolver => lazy.Value);
+			return this;
 		}
 	}
 }

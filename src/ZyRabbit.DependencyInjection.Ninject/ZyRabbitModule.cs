@@ -1,6 +1,5 @@
 ﻿using Ninject;
 using Ninject.Modules;
-using ZyRabbit.DependencyInjection;
 using ZyRabbit.Instantiation;
 
 namespace ZyRabbit.DependencyInjection.Ninject
