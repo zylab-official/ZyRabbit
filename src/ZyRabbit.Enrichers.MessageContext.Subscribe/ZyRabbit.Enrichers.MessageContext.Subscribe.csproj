@@ -23,9 +23,4 @@
     <ProjectReference Include="..\ZyRabbit.Operations.Subscribe\ZyRabbit.Operations.Subscribe.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
 </Project>

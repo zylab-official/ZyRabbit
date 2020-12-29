@@ -1,21 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Authors>par.dahlman</Authors>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <PackageId>ZyRabbit.IntegrationTests</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessagePack\ZyRabbit.Enrichers.MessagePack.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.Protobuf\ZyRabbit.Enrichers.Protobuf.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.RetryLater\ZyRabbit.Enrichers.RetryLater.csproj" />
-    <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.ZeroFormatter\ZyRabbit.Enrichers.ZeroFormatter.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Tools\ZyRabbit.Operations.Tools.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit\ZyRabbit.csproj" />
-    <ProjectReference Include="..\..\src\ZyRabbit.Compatibility.Legacy\ZyRabbit.Compatibility.Legacy.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Get\ZyRabbit.Operations.Get.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Publish\ZyRabbit.Operations.Publish.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Subscribe\ZyRabbit.Operations.Subscribe.csproj" />
@@ -34,15 +26,10 @@
     <ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.Ninject\ZyRabbit.DependencyInjection.Ninject.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
     <PackageReference Include="Moq" Version="4.7.137" />
-    <PackageReference Include="xunit" Version="2.3.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="1.0.2" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
+    <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup>
     <None Update="xunit.runner.json">

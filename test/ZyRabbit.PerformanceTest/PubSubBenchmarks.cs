@@ -2,33 +2,27 @@
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using ZyRabbit.Instantiation;
-using ZyRabbit.Pipe;
-using ZyRabbit.Pipe.Middleware;
 
 namespace ZyRabbit.PerformanceTest
 {
 	public class PubSubBenchmarks
 	{
 		private IBusClient _busClient;
-		private Task _completedTask;
-		private Message _message;
-		public event EventHandler MessageReceived;
-		public delegate void MessageReceivedEventHandler(EventHandler e);
-		
-		[Setup]
+		private Message _message = new Message();
+		private Action<Message> _subscribe;
+
+		[GlobalSetup]
 		public void Setup()
 		{
 			_busClient = ZyRabbitFactory.CreateSingleton();
-			_completedTask = Task.FromResult(0);
-			_message = new Message();
 			_busClient.SubscribeAsync<Message>(message =>
 			{
-				MessageReceived(message, EventArgs.Empty);
-				return _completedTask;
+				_subscribe(message);
+				return Task.CompletedTask;
 			});
 		}
 
-		[Cleanup]
+		[GlobalCleanup]
 		public void Cleanup()
 		{
 			_busClient.DeleteQueueAsync<Message>();
@@ -39,60 +33,52 @@ namespace ZyRabbit.PerformanceTest
 		public async Task ConsumerAcknowledgements_Off()
 		{
 			var msgTsc = new TaskCompletionSource<Message>();
-
-			EventHandler onMessageReceived = (sender, args) => { msgTsc.TrySetResult(sender as Message); };
-			MessageReceived += onMessageReceived;
-
+			_subscribe = message => msgTsc.SetResult(message);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			_busClient.PublishAsync(_message, ctx => ctx.UsePublishAcknowledge(false));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			await msgTsc.Task;
- 			MessageReceived -= onMessageReceived;
 		}
 
 		[Benchmark]
 		public async Task ConsumerAcknowledgements_On()
 		{
 			var msgTsc = new TaskCompletionSource<Message>();
-
-			EventHandler onMessageReceived = (sender, args) => { msgTsc.TrySetResult(sender as Message); };
-			MessageReceived += onMessageReceived;
-
+			_subscribe = message => msgTsc.SetResult(message);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			_busClient.PublishAsync(_message);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			await msgTsc.Task;
-			MessageReceived -= onMessageReceived;
 		}
 
 		[Benchmark]
 		public async Task DeliveryMode_NonPersistant()
 		{
 			var msgTsc = new TaskCompletionSource<Message>();
-
-			EventHandler onMessageReceived = (sender, args) => { msgTsc.TrySetResult(sender as Message); };
-			MessageReceived += onMessageReceived;
-
+			_subscribe = message => msgTsc.SetResult(message);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			_busClient.PublishAsync(_message, ctx => ctx
 				.UsePublishConfiguration(cfg => cfg
 					.WithProperties(p => p.DeliveryMode = 1))
 			);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			await msgTsc.Task;
-			MessageReceived -= onMessageReceived;
 		}
 
 		[Benchmark]
 		public async Task DeliveryMode_Persistant()
 		{
 			var msgTsc = new TaskCompletionSource<Message>();
-
-			EventHandler onMessageReceived = (sender, args) => { msgTsc.TrySetResult(sender as Message); };
-			MessageReceived += onMessageReceived;
-
+			_subscribe = message => msgTsc.SetResult(message);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			_busClient.PublishAsync(_message, ctx => ctx
 				.UsePublishConfiguration(cfg => cfg
 					.WithProperties(p => p.DeliveryMode = 2))
 			);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			await msgTsc.Task;
-			MessageReceived -= onMessageReceived;
 		}
-	}
 
-	public class Message { }
+		public class Message { }
+	}
 }

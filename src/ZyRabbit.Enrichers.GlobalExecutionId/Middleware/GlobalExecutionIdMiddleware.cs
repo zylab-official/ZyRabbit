@@ -5,10 +5,6 @@ using ZyRabbit.Logging;
 using ZyRabbit.Pipe;
 using ZyRabbit.Pipe.Middleware;
 
-#if NET451
-using System.Runtime.Remoting.Messaging;
-#endif
-
 namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 {
 	public class GlobalExecutionOptions
@@ -23,11 +19,7 @@ namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 		protected Func<IPipeContext, string> IdFunc;
 		protected Action<IPipeContext, string> PersistAction;
 
-#if NETSTANDARD2_0
 		protected static readonly AsyncLocal<string> ExecutionId = new AsyncLocal<string>();
-#elif NET451
-		protected const string GlobalExecutionId = "ZyRabbit:GlobalExecutionId";
-#endif
 		private readonly ILog _logger = LogProvider.For<GlobalExecutionIdMiddleware>();
 
 		public GlobalExecutionIdMiddleware(GlobalExecutionOptions options = null)
@@ -67,11 +59,7 @@ namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 		protected virtual string GetExecutionIdFromProcess()
 		{
 			string executionId = null;
-#if NETSTANDARD2_0
 			executionId = ExecutionId?.Value;
-#elif NET451
-			executionId = CallContext.LogicalGetData(GlobalExecutionId) as string;
-#endif
 			return executionId;
 		}
 
@@ -87,11 +75,7 @@ namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 
 		protected virtual void SaveIdInProcess(string executionId)
 		{
-#if NETSTANDARD2_0
 			ExecutionId.Value = executionId;
-#elif NET451
-			CallContext.LogicalSetData(GlobalExecutionId, executionId);
-#endif
 		}
 	}
 }

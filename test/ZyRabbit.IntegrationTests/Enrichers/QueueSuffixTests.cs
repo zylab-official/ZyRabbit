@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using ZyRabbit.Enrichers.QueueSuffix;
 using ZyRabbit.Instantiation;
 using ZyRabbit.IntegrationTests.TestMessages;
-using ZyRabbit.Pipe;
 using Xunit;
 
 namespace ZyRabbit.IntegrationTests.Enrichers
@@ -26,12 +25,12 @@ namespace ZyRabbit.IntegrationTests.Enrichers
 				await firstClient.SubscribeAsync<BasicMessage>(message =>
 				{
 					firstTsc.TrySetResult(message);
-					return Task.FromResult(0);
+					return Task.CompletedTask;
 				});
 				await secondClient.SubscribeAsync<BasicMessage>(message =>
 				{
 					secondTsc.TrySetResult(message);
-					return Task.FromResult(0);
+					return Task.CompletedTask;
 				});
 
 				/* Test */

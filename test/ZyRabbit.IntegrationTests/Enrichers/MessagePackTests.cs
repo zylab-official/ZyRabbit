@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using MessagePack;
 using ZyRabbit.Enrichers.MessagePack;
-using ZyRabbit.Enrichers.ZeroFormatter;
 using ZyRabbit.Instantiation;
 using Xunit;
 
