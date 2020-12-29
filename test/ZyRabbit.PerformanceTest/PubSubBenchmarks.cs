@@ -8,15 +8,16 @@ namespace ZyRabbit.PerformanceTest
 	public class PubSubBenchmarks
 	{
 		private IBusClient _busClient;
-		private Message _message;
+		private Message _message = new Message();
+		private Action<Message> _subscribe;
 
 		[GlobalSetup]
 		public void Setup()
 		{
 			_busClient = ZyRabbitFactory.CreateSingleton();
-			_message = new Message();
 			_busClient.SubscribeAsync<Message>(message =>
 			{
+				_subscribe(message);
 				return Task.CompletedTask;
 			});
 		}
@@ -31,33 +32,53 @@ namespace ZyRabbit.PerformanceTest
 		[Benchmark]
 		public async Task ConsumerAcknowledgements_Off()
 		{
-			await _busClient.PublishAsync(_message, ctx => ctx.UsePublishAcknowledge(false));
+			var msgTsc = new TaskCompletionSource<Message>();
+			_subscribe = message => msgTsc.SetResult(message);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+			_busClient.PublishAsync(_message, ctx => ctx.UsePublishAcknowledge(false));
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+			await msgTsc.Task;
 		}
 
 		[Benchmark]
 		public async Task ConsumerAcknowledgements_On()
 		{
-			await _busClient.PublishAsync(_message);
+			var msgTsc = new TaskCompletionSource<Message>();
+			_subscribe = message => msgTsc.SetResult(message);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+			_busClient.PublishAsync(_message);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+			await msgTsc.Task;
 		}
 
 		[Benchmark]
 		public async Task DeliveryMode_NonPersistant()
 		{
-			await _busClient.PublishAsync(_message, ctx => ctx
+			var msgTsc = new TaskCompletionSource<Message>();
+			_subscribe = message => msgTsc.SetResult(message);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+			_busClient.PublishAsync(_message, ctx => ctx
 				.UsePublishConfiguration(cfg => cfg
 					.WithProperties(p => p.DeliveryMode = 1))
 			);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+			await msgTsc.Task;
 		}
 
 		[Benchmark]
 		public async Task DeliveryMode_Persistant()
 		{
-			await _busClient.PublishAsync(_message, ctx => ctx
+			var msgTsc = new TaskCompletionSource<Message>();
+			_subscribe = message => msgTsc.SetResult(message);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+			_busClient.PublishAsync(_message, ctx => ctx
 				.UsePublishConfiguration(cfg => cfg
 					.WithProperties(p => p.DeliveryMode = 2))
 			);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+			await msgTsc.Task;
 		}
-	}
 
-	public class Message { }
+		public class Message { }
+	}
 }
