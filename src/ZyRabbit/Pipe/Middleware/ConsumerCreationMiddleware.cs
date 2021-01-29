@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
-using ZyRabbit.Configuration.Consume;
 using ZyRabbit.Consumer;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
@@ -15,14 +14,14 @@ namespace ZyRabbit.Pipe.Middleware
 
 	public class ConsumerCreationMiddleware : Middleware
 	{
-		protected IConsumerFactory ConsumerFactory;
-		protected Func<IPipeContext, ConsumeConfiguration> ConfigFunc;
-		protected Func<IConsumerFactory, CancellationToken, IPipeContext, Task<IBasicConsumer>> ConsumerFunc;
-		private readonly ILog _logger = LogProvider.For<ConsumerCreationMiddleware>();
+		protected readonly IConsumerFactory ConsumerFactory;
+		protected readonly Func<IConsumerFactory, CancellationToken, IPipeContext, Task<IBasicConsumer>> ConsumerFunc;
+		protected readonly ILogger<ConsumerCreationMiddleware> Logger;
 
-		public ConsumerCreationMiddleware(IConsumerFactory consumerFactory, ConsumerCreationOptions options = null)
+		public ConsumerCreationMiddleware(IConsumerFactory consumerFactory, ILogger<ConsumerCreationMiddleware> logger, ConsumerCreationOptions options = null)
 		{
-			ConsumerFactory = consumerFactory;
+			ConsumerFactory = consumerFactory ?? throw new ArgumentNullException(nameof(consumerFactory));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			ConsumerFunc = options?.ConsumerFunc ?? ((factory, token, context) => factory.CreateConsumerAsync(context.GetChannel(), token));
 		}
 
@@ -38,7 +37,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var consumerTask = ConsumerFunc(ConsumerFactory, token, context);
 			if (consumerTask == null)
 			{
-				_logger.Warn("No Consumer creation task found in Pipe context.");
+				Logger.LogWarning("No Consumer creation task found in Pipe context.");
 			}
 			return consumerTask;
 		}

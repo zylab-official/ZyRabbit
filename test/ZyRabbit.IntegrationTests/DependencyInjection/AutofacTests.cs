@@ -6,7 +6,6 @@ using ZyRabbit.Configuration;
 using ZyRabbit.DependencyInjection.Autofac;
 using ZyRabbit.Instantiation;
 using ZyRabbit.IntegrationTests.TestMessages;
-using ZyRabbit.Logging;
 using Xunit;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
@@ -14,7 +13,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 	public class AutofacTests
 	{
 		[Fact]
-		public async Task Should_Be_Able_To_Resolve_Client_From_Autofac()
+		public void Should_Be_Able_To_Resolve_Client_From_Autofac()
 		{
 			/* Setup */
 			var builder = new ContainerBuilder();
@@ -75,7 +74,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		}
 
 		[Fact]
-		public async Task Should_Be_Able_To_Resolve_Client_With_Plugins_From_Autofac()
+		public void Should_Be_Able_To_Resolve_Client_With_Plugins_From_Autofac()
 		{
 			/* Setup */
 			var builder = new ContainerBuilder();

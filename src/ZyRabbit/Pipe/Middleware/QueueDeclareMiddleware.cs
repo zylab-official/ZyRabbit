@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Common;
 using ZyRabbit.Configuration.Queue;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
@@ -16,11 +16,12 @@ namespace ZyRabbit.Pipe.Middleware
 	{
 		protected readonly Func<IPipeContext, QueueDeclaration> QueueDeclareFunc;
 		protected readonly ITopologyProvider Topology;
-		private readonly ILog _logger = LogProvider.For<QueueDeclareMiddleware>();
+		protected readonly ILogger<QueueDeclareMiddleware> Logger;
 
-		public QueueDeclareMiddleware(ITopologyProvider topology, QueueDeclareOptions options = null )
+		public QueueDeclareMiddleware(ITopologyProvider topology, ILogger<QueueDeclareMiddleware> logger, QueueDeclareOptions options = null )
 		{
-			Topology = topology;
+			Topology = topology ?? throw new ArgumentNullException(nameof(topology));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			QueueDeclareFunc = options?.QueueDeclarationFunc ?? (context => context.GetQueueDeclaration());
 		}
 
@@ -30,12 +31,12 @@ namespace ZyRabbit.Pipe.Middleware
 
 			if (queue != null)
 			{
-				_logger.Debug("Declaring queue '{queueName}'.", queue.Name);
+				Logger.LogDebug("Declaring queue '{queueName}'.", queue.Name);
 				await DeclareQueueAsync(queue, context, token);
 			}
 			else
 			{
-				_logger.Info("Queue will not be declaired: no queue declaration found in context.");
+				Logger.LogWarning("Queue will not be declaired: no queue declaration found in context.");
 			}
 
 			await Next.InvokeAsync(context, token);

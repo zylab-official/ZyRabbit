@@ -1,22 +1,23 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
 	public class StageMarkerMiddleware : Middleware
 	{
 		public readonly string Stage;
-		private readonly ILog _logger = LogProvider.For<StageMarkerMiddleware>();
+		private readonly ILogger<StageMarkerMiddleware> Logger;
 
-		public StageMarkerMiddleware(StageMarkerOptions options)
+		public StageMarkerMiddleware(ILogger<StageMarkerMiddleware> logger, StageMarkerOptions options)
 		{
 			if (options == null)
 			{
 				throw new ArgumentNullException(nameof(options));
 			}
 
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			Stage = options.Stage;
 		}
 
@@ -24,11 +25,11 @@ namespace ZyRabbit.Pipe.Middleware
 		{
 			if (Next is NoOpMiddleware || Next is CancellationMiddleware)
 			{
-				_logger.Debug("Stage {pipeStage} has no additional middlewares registered.", Stage);
+				Logger.LogDebug("Stage {pipeStage} has no additional middlewares registered.", Stage);
 			}
 			else
 			{
-				_logger.Info("Invoking additional middlewares on stage {pipeStage}", Stage);
+				Logger.LogInformation("Invoking additional middlewares on stage {pipeStage}", Stage);
 			}
 			return Next.InvokeAsync(context, token);
 		}

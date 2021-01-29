@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Common
 {
@@ -18,10 +18,11 @@ namespace ZyRabbit.Common
 	{
 		private readonly ConcurrentDictionary<object, SemaphoreSlim> _semaphoreDictionary;
 		private readonly ConcurrentDictionary<object, object> _lockDictionary;
-		private readonly ILog _logger = LogProvider.For<ExclusiveLock>();
+		private readonly ILogger<IExclusiveLock> _logger;
 
-		public ExclusiveLock()
+		public ExclusiveLock(ILogger<IExclusiveLock> logger)
 		{
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_semaphoreDictionary = new ConcurrentDictionary<object, SemaphoreSlim>();
 			_lockDictionary = new ConcurrentDictionary<object, object>();
 		}
@@ -39,7 +40,7 @@ namespace ZyRabbit.Common
 		{
 			var semaphore = _semaphoreDictionary.GetOrAdd(obj, o => new SemaphoreSlim(1, 1));
 			semaphore.Release();
-			return Task.FromResult(0);
+			return Task.CompletedTask;
 		}
 
 		public void Execute<T>(T obj, Action<T> action, CancellationToken token = default(CancellationToken))
@@ -53,7 +54,7 @@ namespace ZyRabbit.Common
 			}
 			catch (Exception e)
 			{
-				_logger.Error("Exception when performing exclusive execute", e);
+				_logger.LogError("Exception when performing exclusive execute", e);
 			}
 			finally
 			{
@@ -72,7 +73,7 @@ namespace ZyRabbit.Common
 			}
 			catch (Exception e)
 			{
-				_logger.ErrorException("Exception when performing exclusive executeasync", e);
+				_logger.LogError("Exception when performing exclusive executeasync", e);
 			}
 			finally
 			{

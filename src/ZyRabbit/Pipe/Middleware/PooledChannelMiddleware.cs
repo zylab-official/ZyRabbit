@@ -20,9 +20,9 @@ namespace ZyRabbit.Pipe.Middleware
 
 		public PooledChannelMiddleware(IChannelPoolFactory poolFactory, PooledChannelOptions options = null)
 		{
-			PoolFactory = poolFactory;
+			PoolFactory = poolFactory ?? throw new ArgumentNullException(nameof(poolFactory));
 			PoolNameFunc = options?.PoolNameFunc;
-			SaveInContextAction = options?.SaveInContextAction ?? ((ctx, value) =>ctx.Properties.TryAdd(PipeKey.TransientChannel, value));
+			SaveInContextAction = options?.SaveInContextAction ?? ((ctx, value) => ctx.Properties.TryAdd(PipeKey.TransientChannel, value));
 		}
 
 		public override async Task InvokeAsync(IPipeContext context, CancellationToken token = default(CancellationToken))

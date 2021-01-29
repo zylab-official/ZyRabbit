@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Operations.StateMachine.Core
 {
@@ -15,11 +15,11 @@ namespace ZyRabbit.Operations.StateMachine.Core
 	{
 		private readonly Func<Guid, Func<Task>, CancellationToken, Task> _exclusiveExecute;
 
-		public GlobalLock(Func<Guid, Func<Task>, CancellationToken, Task> exclusiveExecute = null)
+		public GlobalLock(ILogger<IGlobalLock> logger, Func<Guid, Func<Task>, CancellationToken, Task> exclusiveExecute = null)
 		{
 			if (exclusiveExecute == null)
 			{
-				var processLock = new ProcessGlobalLock();
+				var processLock = new ProcessGlobalLock(logger);
 				exclusiveExecute = (id, handler, ct) => processLock.ExecuteAsync(id, handler, ct);
 			}
 			_exclusiveExecute = exclusiveExecute;
@@ -34,11 +34,12 @@ namespace ZyRabbit.Operations.StateMachine.Core
 	public class ProcessGlobalLock : IGlobalLock
 	{
 		private readonly ConcurrentDictionary<Guid, SemaphoreSlim> _semaphores;
-		private readonly ILog _logger = LogProvider.For<ProcessGlobalLock>();
+		private readonly ILogger<IGlobalLock> _logger;
 
-		public ProcessGlobalLock()
+		public ProcessGlobalLock(ILogger<IGlobalLock> logger)
 		{
 			_semaphores = new ConcurrentDictionary<Guid, SemaphoreSlim>();
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public async Task ExecuteAsync(Guid modelId, Func<Task> handler, CancellationToken ct = default(CancellationToken))
@@ -51,7 +52,7 @@ namespace ZyRabbit.Operations.StateMachine.Core
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e, "Unhandled exception during execution under Global Lock");
+				_logger.LogError(e, "Unhandled exception during execution under Global Lock");
 			}
 			finally
 			{

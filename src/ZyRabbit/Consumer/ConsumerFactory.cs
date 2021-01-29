@@ -2,24 +2,25 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Configuration.Consume;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Consumer
 {
 	public class ConsumerFactory : IConsumerFactory
 	{
 		private readonly IChannelFactory _channelFactory;
+		private readonly ILogger<IConsumerFactory> _logger;
 		private readonly ConcurrentDictionary<string, Lazy<Task<IBasicConsumer>>> _consumerCache;
-		private readonly ILog _logger = LogProvider.For<ConsumerFactory>();
 
-		public ConsumerFactory(IChannelFactory channelFactory)
+		public ConsumerFactory(IChannelFactory channelFactory, ILogger<IConsumerFactory> logger)
 		{
 			_consumerCache = new ConcurrentDictionary<string, Lazy<Task<IBasicConsumer>>>();
-			_channelFactory = channelFactory;
+			_channelFactory = channelFactory ?? throw new ArgumentNullException(nameof(channelFactory));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public Task<IBasicConsumer> GetConsumerAsync(ConsumeConfiguration cfg, IModel channel = null, CancellationToken token = default(CancellationToken))
@@ -71,7 +72,7 @@ namespace ZyRabbit.Consumer
 
 			if (cfg.PrefetchCount > 0)
 			{
-				_logger.Info("Setting Prefetch Count to {prefetchCount}.", cfg.PrefetchCount);
+				_logger.LogInformation("Setting Prefetch Count to {prefetchCount}.", cfg.PrefetchCount);
 				consumer.Model.BasicQos(
 					prefetchSize: 0,
 					prefetchCount: cfg.PrefetchCount,
@@ -79,7 +80,7 @@ namespace ZyRabbit.Consumer
 				);
 			}
 
-			_logger.Info("Preparing to consume message from queue '{queueName}'.", cfg.QueueName);
+			_logger.LogInformation("Preparing to consume message from queue '{queueName}'.", cfg.QueueName);
 
 			consumer.Model.BasicConsume(
 				queue: cfg.QueueName,
@@ -110,7 +111,7 @@ namespace ZyRabbit.Consumer
 
 		protected virtual Task<IModel> GetOrCreateChannelAsync(CancellationToken token = default(CancellationToken))
 		{
-			_logger.Info("Creating a dedicated channel for consumer.");
+			_logger.LogInformation("Creating a dedicated channel for consumer.");
 			return _channelFactory.CreateChannelAsync(token);
 		}
 

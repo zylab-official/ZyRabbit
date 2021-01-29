@@ -54,15 +54,15 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 			return this;
 		}
 
-		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, object> instanceCreator)
+		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
 		{
-			Collection.AddTransient(type, c => instanceCreator(new ServiceProviderAdapter(c)));
+			Collection.AddTransient(type, c => instanceCreator(new ServiceProviderAdapter(c), type));
 			return this;
 		}
 
-		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, object> instanceCreator)
+		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
 		{
-			Collection.AddSingleton(type, c => instanceCreator(new ServiceProviderAdapter(c)));
+			Collection.AddSingleton(type, c => instanceCreator(new ServiceProviderAdapter(c), type));
 			return this;
 		}
 	}

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using ZyRabbit.Common;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
@@ -26,11 +26,12 @@ namespace ZyRabbit.Pipe.Middleware
 		protected Func<IPipeContext, bool> MandatoryFunc;
 		protected Func<IPipeContext, IBasicProperties> BasicPropsFunc;
 		protected Func<IPipeContext, byte[]> BodyFunc;
-		private ILog _logger = LogProvider.For<BasicPublishMiddleware>();
+		protected readonly ILogger<BasicPublishMiddleware> Logger;
 
-		public BasicPublishMiddleware(IExclusiveLock exclusive, BasicPublishOptions options = null)
+		public BasicPublishMiddleware(IExclusiveLock exclusive, ILogger<BasicPublishMiddleware> logger, BasicPublishOptions options = null)
 		{
-			Exclusive = exclusive;
+			Exclusive = exclusive ?? throw new ArgumentNullException(nameof(exclusive));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			ChannelFunc = options?.ChannelFunc ?? (context => context.GetTransientChannel());
 			ExchangeNameFunc = options?.ExchangeNameFunc ?? (c => c.GetBasicPublishConfiguration()?.ExchangeName);
 			RoutingKeyFunc = options?.RoutingKeyFunc ?? (c => c.GetBasicPublishConfiguration()?.RoutingKey);
@@ -48,7 +49,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var basicProps = GetBasicProps(context);
 			var body = GetMessageBody(context);
 
-			_logger.Info("Performing basic publish with routing key {routingKey} on exchange {exchangeName}.", routingKey, exchangeName);
+			Logger.LogInformation("Performing basic publish with routing key {routingKey} on exchange {exchangeName}.", routingKey, exchangeName);
 
 			ExclusiveExecute(channel, c =>
 					BasicPublish(
@@ -86,7 +87,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var body = BodyFunc(context);
 			if (body == null)
 			{
-				_logger.Warn("No body found in the Pipe context.");
+				Logger.LogInformation("No body found in the Pipe context.");
 			}
 			return body;
 		}
@@ -96,7 +97,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var props = BasicPropsFunc(context);
 			if (props == null)
 			{
-				_logger.Warn("No basic properties found in the Pipe context.");
+				Logger.LogInformation("No basic properties found in the Pipe context.");
 			}
 			return props;
 		}
@@ -111,7 +112,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var routingKey =  RoutingKeyFunc(context);
 			if (routingKey == null)
 			{
-				_logger.Warn("No routing key found in the Pipe context.");
+				Logger.LogInformation("No routing key found in the Pipe context.");
 			}
 			return routingKey;
 		}
@@ -121,7 +122,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var exchange = ExchangeNameFunc(context);
 			if (exchange == null)
 			{
-				_logger.Warn("No exchange name found in the Pipe context.");
+				Logger.LogInformation("No exchange name found in the Pipe context.");
 			}
 			return exchange;
 		}
@@ -131,7 +132,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var channel = ChannelFunc(context);
 			if (channel == null)
 			{
-				_logger.Warn("No channel to perform publish found.");
+				Logger.LogWarning("No channel to perform publish found.");
 			}
 			return channel;
 		}

@@ -7,6 +7,7 @@ using ZyRabbit.Channel;
 using ZyRabbit.Configuration;
 using ZyRabbit.Exceptions;
 using Xunit;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ZyRabbit.Tests.Channel
 {
@@ -28,7 +29,7 @@ namespace ZyRabbit.Tests.Channel
 			connection
 				.Setup(c => c.CloseReason)
 				.Returns(new ShutdownEventArgs(ShutdownInitiator.Application, 0, string.Empty));
-			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local);
+			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local, NullLogger<ChannelFactory>.Instance);
 
 			/* Test */
 			/* Assert */
@@ -59,7 +60,7 @@ namespace ZyRabbit.Tests.Channel
 			connection
 				.Setup(c => c.CloseReason)
 				.Returns(new ShutdownEventArgs(ShutdownInitiator.Library, 0, string.Empty));
-			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local);
+			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local, NullLogger<ChannelFactory>.Instance);
 
 			/* Test */
 			/* Assert */
@@ -91,7 +92,7 @@ namespace ZyRabbit.Tests.Channel
 			connection
 				.Setup(c => c.IsOpen)
 				.Returns(true);
-			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local);
+			var channelFactory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local, NullLogger<ChannelFactory>.Instance);
 
 			/* Test */
 			var retrievedChannel = await channelFactory.CreateChannelAsync();
@@ -118,7 +119,7 @@ namespace ZyRabbit.Tests.Channel
 			connection
 				.Setup(c => c.IsOpen)
 				.Returns(false);
-			var channelFactory = new ChannelFactory(connectionFactroy.Object, ZyRabbitConfiguration.Local);
+			var channelFactory = new ChannelFactory(connectionFactroy.Object, ZyRabbitConfiguration.Local, NullLogger<ChannelFactory>.Instance);
 
 			/* Test */
 			/* Assert */

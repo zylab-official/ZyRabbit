@@ -57,20 +57,21 @@ namespace ZyRabbit.DependencyInjection.Autofac
 			return this;
 		}
 
-		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, object> instanceCreator)
+		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
 		{
 			_builder.RegisterGeneric((ctxt, types, parameters) =>
 			{
-				return instanceCreator(new ComponentContextAdapter(ctxt));
+				return instanceCreator(new ComponentContextAdapter(ctxt), type);
 			}).As(type).InstancePerDependency();
 			return this;
 		}
 
-		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, object> instanceCreator)
+		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
 		{
 			_builder.RegisterGeneric((ctxt, types, parameters) =>
 			{
-				return instanceCreator(new ComponentContextAdapter(ctxt));
+				var generic = type.MakeGenericType(types);
+				return instanceCreator(new ComponentContextAdapter(ctxt), generic);
 			}).As(type).SingleInstance();
 			return this;
 		}

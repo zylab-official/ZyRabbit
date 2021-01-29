@@ -5,6 +5,7 @@ using Moq;
 using RabbitMQ.Client;
 using ZyRabbit.Channel;
 using Xunit;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ZyRabbit.Tests.Channel
 {
@@ -21,7 +22,7 @@ namespace ZyRabbit.Tests.Channel
 					.Setup(c => c.IsClosed)
 					.Returns(false);
 			}
-			var pool = new DynamicChannelPool();
+			var pool = new DynamicChannelPool(NullLogger<IChannelPool>.Instance);
 			pool.Add(channels.Select(c => c.Object));
 
 			/* Test */
@@ -39,7 +40,7 @@ namespace ZyRabbit.Tests.Channel
 		public void Should_Not_Throw_Exception_If_Trying_To_Remove_Channel_Not_In_Pool()
 		{
 			/* Setup */
-			var pool = new DynamicChannelPool();
+			var pool = new DynamicChannelPool(NullLogger<IChannelPool>.Instance);
 			var channel = new Mock<IModel>();
 
 			/* Test */
@@ -65,7 +66,7 @@ namespace ZyRabbit.Tests.Channel
 					.Setup(c => c.IsOpen)
 					.Returns(true);
 			}
-			var pool = new DynamicChannelPool(channels.Select(c => c.Object));
+			var pool = new DynamicChannelPool(channels.Select(c => c.Object), NullLogger<IChannelPool>.Instance);
 
 			/* Test */
 			pool.Remove(2);

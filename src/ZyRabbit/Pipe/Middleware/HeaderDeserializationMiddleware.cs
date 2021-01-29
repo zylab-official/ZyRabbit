@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
-using ZyRabbit.Logging;
 using ZyRabbit.Serialization;
 
 namespace ZyRabbit.Pipe.Middleware
@@ -19,19 +18,20 @@ namespace ZyRabbit.Pipe.Middleware
 	public class HeaderDeserializationMiddleware : StagedMiddleware
 	{
 		protected readonly ISerializer Serializer;
-		protected Func<IPipeContext, BasicDeliverEventArgs> DeliveryArgsFunc;
-		protected Action<IPipeContext, object> ContextSaveAction;
-		protected Func<IPipeContext, string> HeaderKeyFunc;
-		protected Func<IPipeContext, Type> HeaderTypeFunc;
-		private readonly ILog _logger = LogProvider.For<HeaderDeserializationMiddleware>();
+		protected readonly Func<IPipeContext, BasicDeliverEventArgs> DeliveryArgsFunc;
+		protected readonly Action<IPipeContext, object> ContextSaveAction;
+		protected readonly Func<IPipeContext, string> HeaderKeyFunc;
+		protected readonly Func<IPipeContext, Type> HeaderTypeFunc;
+		protected readonly ILogger<HeaderDeserializationMiddleware> Logger;
 
-		public HeaderDeserializationMiddleware(ISerializer serializer, HeaderDeserializationOptions options = null)
+		public HeaderDeserializationMiddleware(ISerializer serializer, ILogger<HeaderDeserializationMiddleware> logger, HeaderDeserializationOptions options = null)
 		{
 			DeliveryArgsFunc = options?.DeliveryArgsFunc ?? (context => context.GetDeliveryEventArgs());
 			HeaderKeyFunc = options?.HeaderKeyFunc;
 			ContextSaveAction = options?.ContextSaveAction ?? ((context, item) => context.Properties.TryAdd(HeaderKeyFunc(context), item));
 			HeaderTypeFunc = options?.HeaderTypeFunc ?? (context =>typeof(object)) ;
-			Serializer = serializer;
+			Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public override async Task InvokeAsync(IPipeContext context, CancellationToken token = default(CancellationToken))
@@ -66,17 +66,17 @@ namespace ZyRabbit.Pipe.Middleware
 			var args = GetDeliveryArgs(context);
 			if (string.IsNullOrEmpty(headerKey))
 			{
-				_logger.Debug("Key {headerKey} not found.", headerKey);
+				Logger.LogDebug("Key {headerKey} not found.", headerKey);
 				return null;
 			}
 			if (args == null)
 			{
-				_logger.Debug("DeliveryEventArgs not found.");
+				Logger.LogDebug("DeliveryEventArgs not found.");
 				return null;
 			}
 			if (args.BasicProperties.Headers == null || !args.BasicProperties.Headers.ContainsKey(headerKey))
 			{
-				_logger.Info("BasicProperties Header does not contain {headerKey}", headerKey);
+				Logger.LogDebug("BasicProperties Header does not contain {headerKey}", headerKey);
 				return null;
 			}
 
@@ -89,38 +89,18 @@ namespace ZyRabbit.Pipe.Middleware
 		protected virtual BasicDeliverEventArgs GetDeliveryArgs(IPipeContext context)
 		{
 			var args = DeliveryArgsFunc(context);
-			if (args == null)
-			{
-				_logger.Warn("Unable to extract delivery args from Pipe Context.");
-			}
 			return args;
 		}
 
 		protected virtual string GetHeaderKey(IPipeContext context)
 		{
 			var key = HeaderKeyFunc(context);
-			if (key == null)
-			{
-				_logger.Warn("Unable to extract header key from Pipe context.");
-			}
-			else
-			{
-				_logger.Debug("Trying to extract {headerKey} from header", key);
-			}
 			return key;
 		}
 
 		protected virtual Type GetHeaderType(IPipeContext context)
 		{
 			var type = HeaderTypeFunc(context);
-			if (type == null)
-			{
-				_logger.Warn("Unable to extract header type from Pipe context.");
-			}
-			else
-			{
-				_logger.Debug("Header type extracted: '{headerType}'", type.Name);
-			}
 			return type;
 		}
 

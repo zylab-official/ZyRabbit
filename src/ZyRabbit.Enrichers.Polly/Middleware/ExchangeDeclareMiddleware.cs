@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Common;
@@ -10,8 +11,8 @@ namespace ZyRabbit.Enrichers.Polly.Middleware
 {
 	public class ExchangeDeclareMiddleware : Pipe.Middleware.ExchangeDeclareMiddleware
 	{
-		public ExchangeDeclareMiddleware(ITopologyProvider topologyProvider, ExchangeDeclareOptions options = null)
-			: base(topologyProvider, options) { }
+		public ExchangeDeclareMiddleware(ITopologyProvider topologyProvider, ILogger<Pipe.Middleware.ExchangeDeclareMiddleware> logger, ExchangeDeclareOptions options = null)
+			: base(topologyProvider, logger, options) { }
 
 		protected override Task DeclareExchangeAsync(ExchangeDeclaration exchange, IPipeContext context, CancellationToken token)
 		{

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using ZyRabbit.Consumer;
 using ZyRabbit.Pipe;
@@ -10,8 +11,8 @@ namespace ZyRabbit.Enrichers.Polly.Middleware
 {
 	public class ConsumerCreationMiddleware : Pipe.Middleware.ConsumerCreationMiddleware
 	{
-		public ConsumerCreationMiddleware(IConsumerFactory consumerFactory, ConsumerCreationOptions options = null)
-			: base(consumerFactory, options) { }
+		public ConsumerCreationMiddleware(IConsumerFactory consumerFactory, ILogger<Pipe.Middleware.ConsumerCreationMiddleware> logger, ConsumerCreationOptions options = null)
+			: base(consumerFactory, logger, options) { }
 
 		protected override Task<IBasicConsumer> GetOrCreateConsumerAsync(IPipeContext context, CancellationToken token)
 		{
