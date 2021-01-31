@@ -6,18 +6,18 @@ using Ninject.Parameters;
 
 namespace ZyRabbit.DependencyInjection.Ninject
 {
-	public class NinjectAdapter : IDependencyResolver
+	public class NinjectResolverAdapter : IDependencyResolver
 	{
 		private readonly IContext _context;
 
-		public NinjectAdapter(IContext context)
+		public NinjectResolverAdapter(IContext context)
 		{
-			_context = context;
+			_context = context ?? throw new ArgumentNullException(nameof(context));
 		}
 
 		public TService GetService<TService>(params object[] additional)
 		{
-			return (TService) GetService(typeof(TService), additional);
+			return (TService)GetService(typeof(TService), additional);
 		}
 
 		public object GetService(Type serviceType, params object[] additional)

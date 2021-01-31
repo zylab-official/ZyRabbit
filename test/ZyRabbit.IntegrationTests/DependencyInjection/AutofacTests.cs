@@ -13,23 +13,6 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 	public class AutofacTests
 	{
 		[Fact]
-		public void Should_Be_Able_To_Resolve_Client_From_Autofac()
-		{
-			/* Setup */
-			var builder = new ContainerBuilder();
-			builder.RegisterZyRabbit();
-			var container = builder.Build();
-
-			/* Test */
-			var client = container.Resolve<IBusClient>();
-			var disposer = container.Resolve<IResourceDisposer>();
-
-			/* Assert */
-			disposer.Dispose();
-			Assert.True(true);
-		}
-
-		[Fact]
 		public async Task Should_Be_Able_To_Publish_Message_From_Resolved_Client()
 		{
 			/* Setup */
@@ -45,7 +28,6 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Assert */
 			disposer.Dispose();
-			Assert.True(true);
 		}
 
 		[Fact]
@@ -67,10 +49,6 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 				var client = container.Resolve<IBusClient>();
 				await client.CreateChannelAsync();
 			});
-
-
-			/* Assert */
-			Assert.True(true);
 		}
 
 		[Fact]
@@ -90,7 +68,6 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Assert */
 			disposer.Dispose();
-			Assert.True(true);
 		}
 	}
 }

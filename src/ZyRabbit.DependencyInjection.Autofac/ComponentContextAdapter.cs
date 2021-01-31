@@ -16,7 +16,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 
 		public ComponentContextAdapter(IComponentContext context)
 		{
-			_context = context;
+			_context = context ?? throw new ArgumentNullException(nameof(context));
 		}
 
 		public TService GetService<TService>(params object[] additional)
@@ -29,7 +29,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 			var parameters = additional
 				.Select(a => new TypedParameter(a.GetType(), a))
 				.ToList<Parameter>();
-			return _context.Resolve(serviceType, parameters);
+			return _context.Resolve(serviceType ?? throw new ArgumentNullException(nameof(serviceType)), parameters);
 		}
 	}
 }

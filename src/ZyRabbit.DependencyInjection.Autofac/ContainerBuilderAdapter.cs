@@ -9,7 +9,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 
 		public ContainerBuilderAdapter(ContainerBuilder builder)
 		{
-			_builder = builder;
+			_builder = builder ?? throw new ArgumentNullException(nameof(builder));
 		}
 
 		public IDependencyRegister AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator) where TService : class where TImplementation : class, TService
