@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -172,6 +173,26 @@ namespace ZyRabbit.DependencyInjection
 
 			var lazy = new Lazy<object>(() => instanceCreator(this, type));
 			_registrations.Add(type, instanceCreator);
+			return this;
+		}
+
+		private readonly ConcurrentDictionary<Type, object> _singletonInstances = new ConcurrentDictionary<Type, object>();
+
+		public IDependencyRegister AddSingleton(Type type, Type implementationType)
+		{
+			AddTransient(type, (resolver, requestedType) => {
+				var result = _singletonInstances.GetOrAdd(requestedType, _ =>
+				{
+					if (implementationType.IsGenericTypeDefinition)
+					{						
+						var ts = implementationType.MakeGenericType(requestedType.GetGenericArguments());
+						return CreateInstance(ts, Enumerable.Empty<object>());
+					}
+
+					return CreateInstance(requestedType, Enumerable.Empty<object>());
+				});
+				return result;
+			});
 			return this;
 		}
 	}

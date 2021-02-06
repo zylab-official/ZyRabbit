@@ -12,7 +12,6 @@
 		<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <DefineConstants>LIBLOG_PORTABLE</DefineConstants>
   </PropertyGroup>
 	<ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

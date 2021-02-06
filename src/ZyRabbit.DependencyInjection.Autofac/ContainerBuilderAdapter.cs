@@ -75,5 +75,20 @@ namespace ZyRabbit.DependencyInjection.Autofac
 			}).As(type).SingleInstance();
 			return this;
 		}
+
+		public IDependencyRegister AddSingleton(Type type, Type implementationType)
+		{
+			if (type.IsGenericTypeDefinition)
+			{
+				_builder.RegisterGeneric(implementationType).As(type).SingleInstance();
+			}
+			else
+			{
+				_builder.RegisterType(implementationType).As(type).SingleInstance();
+
+			}
+
+			return this;
+		}
 	}
 }

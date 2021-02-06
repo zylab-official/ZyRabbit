@@ -9,13 +9,7 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 
 		public ServiceProviderAdapter(IServiceProvider provider)
 		{
-			_provider = provider;
-		}
-
-		public ServiceProviderAdapter(IServiceCollection collection)
-		{
-			collection.AddSingleton<IDependencyResolver, ServiceProviderAdapter>(provider => this);
-			_provider = collection.BuildServiceProvider();
+			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 		}
 
 		public TService GetService<TService>(params object[] additional)

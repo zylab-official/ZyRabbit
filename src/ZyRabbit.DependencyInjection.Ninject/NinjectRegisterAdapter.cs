@@ -27,6 +27,12 @@ namespace ZyRabbit.DependencyInjection.Ninject
 			return this;
 		}
 
+		public IDependencyRegister AddSingleton(Type type, Type implementationType)
+		{
+			_kernel.Bind(type).To(implementationType).InSingletonScope();
+			return this;
+		}
+
 		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
 		{
 			_kernel.Bind(type).ToMethod(ctx => instanceCreator(new NinjectResolverAdapter(ctx), type)).InTransientScope();

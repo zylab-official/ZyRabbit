@@ -13,10 +13,6 @@
     <PackageTags>rabbitmq;zyrabbit;operation;tools</PackageTags>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;LIBLOG_PORTABLE</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ZyRabbit\ZyRabbit.csproj" />
   </ItemGroup>
