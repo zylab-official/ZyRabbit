@@ -93,7 +93,6 @@ namespace ZyRabbit.DependencyInjection
 				.AddSingleton<IPipeContextFactory, PipeContextFactory>()
 				.AddTransient<IExtendedPipeBuilder, PipeBuilder>(resolver => new PipeBuilder(resolver))
 				.AddSingleton<IPipeBuilderFactory>(provider => new PipeBuilderFactory(provider))
-				.AddSingleton<ILoggerFactory, NullLoggerFactory>()
 				.AddSingleton(typeof(ILogger<>), typeof(Logger<>))
 				.AddSingleton<ILogger, NullLogger>(resolver => NullLogger.Instance);
 

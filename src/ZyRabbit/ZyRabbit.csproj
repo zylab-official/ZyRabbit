@@ -25,9 +25,6 @@
 	    <PackagePath></PackagePath>
 	  </None>
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Logging\" />
-	</ItemGroup>
 	<PropertyGroup>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageIcon>icon.png</PackageIcon>
