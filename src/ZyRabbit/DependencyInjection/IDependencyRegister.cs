@@ -4,12 +4,10 @@ namespace ZyRabbit.DependencyInjection
 {
 	public interface IDependencyRegister
 	{
-		IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, Type, object> instanceCreator);
 		IDependencyRegister AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator)
 			where TService : class where TImplementation : class, TService;
 		IDependencyRegister AddTransient<TService, TImplementation>()
 			where TImplementation : class, TService where TService : class;
-		IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, Type, object> instanceCreator);
 		IDependencyRegister AddSingleton(Type type, Type implementationType);
 		IDependencyRegister AddSingleton<TService>(TService instance)
 			where TService : class;

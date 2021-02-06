@@ -28,7 +28,7 @@ namespace ZyRabbit
 					.Replace<TransientChannelMiddleware, Enrichers.Polly.Middleware.TransientChannelMiddleware>(argsFunc: oldArgs => oldArgs)
 					.Replace<HandlerInvocationMiddleware, Enrichers.Polly.Middleware.HandlerInvocationMiddleware>(argsFunc: oldArgs => oldArgs),
 				ioc => ioc
-					.AddSingleton<IChannelFactory, ZyRabbit.Enrichers.Polly.Services.ChannelFactory>()
+					.AddSingleton<IChannelFactory, Enrichers.Polly.Services.ChannelFactory>()
 					.AddSingleton(options.ConnectionPolicies));
 			return builder;
 		}

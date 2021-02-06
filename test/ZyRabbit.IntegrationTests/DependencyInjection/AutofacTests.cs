@@ -7,10 +7,11 @@ using ZyRabbit.DependencyInjection.Autofac;
 using ZyRabbit.Instantiation;
 using ZyRabbit.IntegrationTests.TestMessages;
 using Xunit;
+using Microsoft.Extensions.Logging;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
-	public class AutofacTests
+	public sealed class AutofacTests
 	{
 		[Fact]
 		public async Task Should_Be_Able_To_Publish_Message_From_Resolved_Client()
@@ -68,6 +69,20 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Assert */
 			disposer.Dispose();
+		}
+
+		[Fact]
+		public void Should_Be_Able_To_Resolve_Logger()
+		{
+			/* Setup */
+			var builder = new ContainerBuilder();
+			builder.RegisterZyRabbit();
+			var container = builder.Build();
+
+			/* Test */
+			var logger1 = container.Resolve<ILogger<IExclusiveLock>>();
+			var logger2 = container.Resolve<ILogger<IExclusiveLock>>();
+			Assert.Same(logger1, logger2);
 		}
 	}
 }

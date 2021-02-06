@@ -12,13 +12,10 @@ namespace ZyRabbit.DependencyInjection
 
 		public IDependencyRegister AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator) where TService : class where TImplementation : class, TService
 		{
-			if (_registrations.ContainsKey(typeof(TService)))
-			{
-				_registrations.Remove(typeof(TService));
-			}
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
 
-			Func<IDependencyResolver, Type, object> func = (resolver, type) => instanceCreator(resolver);
-			_registrations.Add(typeof(TService), func);
+			_registrations[typeof(TService)] = (resolver, type) => instanceCreator(resolver);
 			return this;
 		}
 
@@ -36,6 +33,9 @@ namespace ZyRabbit.DependencyInjection
 
 		public IDependencyRegister AddSingleton<TService, TImplementation>(Func<IDependencyResolver, TService> instanceCreator) where TImplementation : class, TService where TService : class
 		{
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
+
 			var lazy = new Lazy<TImplementation>(() => (TImplementation)instanceCreator(this));
 			AddTransient<TService,TImplementation>(resolver => lazy.Value);
 			return this;
@@ -91,6 +91,9 @@ namespace ZyRabbit.DependencyInjection
 
 		public object GetService(Type serviceType, params object[] additional)
 		{
+			if (serviceType == null)
+				throw new ArgumentNullException(nameof(serviceType));
+
 			var (type, result) = FindRegistrationKey(serviceType);
 			switch (result)
 			{
@@ -153,34 +156,16 @@ namespace ZyRabbit.DependencyInjection
 			return ctor.Invoke(dependencies);
 		}
 
-		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
-		{
-			if (_registrations.ContainsKey(type))
-			{
-				_registrations.Remove(type);
-			}
-
-			_registrations.Add(type, instanceCreator);
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
-		{
-			if (_registrations.ContainsKey(type))
-			{
-				_registrations.Remove(type);
-			}
-
-			var lazy = new Lazy<object>(() => instanceCreator(this, type));
-			_registrations.Add(type, instanceCreator);
-			return this;
-		}
-
 		private readonly ConcurrentDictionary<Type, object> _singletonInstances = new ConcurrentDictionary<Type, object>();
 
 		public IDependencyRegister AddSingleton(Type type, Type implementationType)
 		{
-			AddTransient(type, (resolver, requestedType) => {
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+			if (implementationType == null)
+				throw new ArgumentNullException(nameof(implementationType));
+
+			_registrations[type] = (resolver, requestedType) => {
 				var result = _singletonInstances.GetOrAdd(requestedType, _ =>
 				{
 					if (implementationType.IsGenericTypeDefinition)
@@ -192,7 +177,7 @@ namespace ZyRabbit.DependencyInjection
 					return CreateInstance(requestedType, Enumerable.Empty<object>());
 				});
 				return result;
-			});
+			};
 			return this;
 		}
 	}

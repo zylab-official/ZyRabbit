@@ -7,6 +7,7 @@ using ZyRabbit.DependencyInjection;
 using ZyRabbit.Common;
 using ZyRabbit.IntegrationTests.TestMessages;
 using RabbitMQ.Client.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -58,6 +59,19 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Assert */
 			disposer.Dispose();
+		}
+
+		[Fact]
+		public void Should_Be_Able_To_Resolve_Logger()
+		{
+			/* Setup */
+			var container = new SimpleDependencyInjection();
+			container.AddZyRabbit();
+
+			/* Test */
+			var logger1 = container.GetService<ILogger<IExclusiveLock>>();
+			var logger2 = container.GetService<ILogger<IExclusiveLock>>();
+			Assert.Same(logger1, logger2);
 		}
 	}
 }

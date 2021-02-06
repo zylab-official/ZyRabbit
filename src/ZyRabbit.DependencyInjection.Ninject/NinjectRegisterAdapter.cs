@@ -12,15 +12,6 @@ namespace ZyRabbit.DependencyInjection.Ninject
 			_kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
 		}
 
-		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
-		{
-			_kernel.Bind(type).ToMethod(ctx =>
-			{
-				return instanceCreator(new NinjectResolverAdapter(ctx), ctx.Request.Service);
-			}).InSingletonScope();
-			return this;
-		}
-
 		public IDependencyRegister AddSingleton<TService>(TService instance) where TService : class
 		{
 			_kernel.Bind<TService>().ToConstant(instance);
@@ -29,18 +20,20 @@ namespace ZyRabbit.DependencyInjection.Ninject
 
 		public IDependencyRegister AddSingleton(Type type, Type implementationType)
 		{
-			_kernel.Bind(type).To(implementationType).InSingletonScope();
-			return this;
-		}
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+			if (implementationType == null)
+				throw new ArgumentNullException(nameof(implementationType));
 
-		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
-		{
-			_kernel.Bind(type).ToMethod(ctx => instanceCreator(new NinjectResolverAdapter(ctx), type)).InTransientScope();
+			_kernel.Bind(type).To(implementationType).InSingletonScope();
 			return this;
 		}
 
 		IDependencyRegister IDependencyRegister.AddSingleton<TService, TImplementation>(Func<IDependencyResolver, TService> instanceCreator)
 		{
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
+
 			_kernel.Bind<TService>().ToMethod(ctx => instanceCreator(new NinjectResolverAdapter(ctx))).InSingletonScope();
 			return this;
 		}
@@ -53,6 +46,9 @@ namespace ZyRabbit.DependencyInjection.Ninject
 
 		IDependencyRegister IDependencyRegister.AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator)
 		{
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
+
 			_kernel.Bind<TService>().ToMethod(ctx => instanceCreator(new NinjectResolverAdapter(ctx))).InTransientScope();
 			return this;
 		}

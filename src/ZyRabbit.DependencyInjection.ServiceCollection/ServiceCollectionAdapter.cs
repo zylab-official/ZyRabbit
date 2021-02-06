@@ -20,12 +20,18 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 
 		public IDependencyRegister AddTransient<TService>(Func<IDependencyResolver, TService> instanceCreator) where TService : class
 		{
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
+
 			_collection.AddTransient(c => instanceCreator(new ServiceProviderAdapter(c)));
 			return this;
 		}
 
 		public IDependencyRegister AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator) where TService : class where TImplementation : class, TService
 		{
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
+
 			_collection.AddTransient<TService, TImplementation>(c => instanceCreator(new ServiceProviderAdapter(c)));
 			return this;
 		}
@@ -54,20 +60,13 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 			return this;
 		}
 
-		public IDependencyRegister AddTransient(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
-		{
-			_collection.AddTransient(type, c => instanceCreator(new ServiceProviderAdapter(c), type));
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton(Type type, Func<IDependencyResolver, Type, object> instanceCreator)
-		{
-			_collection.AddSingleton(type, c => instanceCreator(new ServiceProviderAdapter(c), type));
-			return this;
-		}
-
 		public IDependencyRegister AddSingleton(Type type, Type implementationType)
 		{
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+			if (implementationType == null)
+				throw new ArgumentNullException(nameof(implementationType));
+
 			_collection.AddSingleton(type, implementationType);
 			return this;
 		}
