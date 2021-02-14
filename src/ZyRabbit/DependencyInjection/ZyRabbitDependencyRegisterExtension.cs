@@ -94,6 +94,7 @@ namespace ZyRabbit.DependencyInjection
 				.AddTransient<IExtendedPipeBuilder, PipeBuilder>(resolver => new PipeBuilder(resolver))
 				.AddSingleton<IPipeBuilderFactory>(provider => new PipeBuilderFactory(provider))
 				.AddSingleton(typeof(ILogger<>), typeof(Logger<>))
+				.AddSingleton<ILoggerFactory, NullLoggerFactory>()
 				.AddSingleton<ILogger, NullLogger>(resolver => NullLogger.Instance);
 
 			var clientBuilder = new ClientBuilder();

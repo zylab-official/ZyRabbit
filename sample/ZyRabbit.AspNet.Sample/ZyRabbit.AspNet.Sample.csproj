@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.ServiceCollection\ZyRabbit.DependencyInjection.ServiceCollection.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.HttpContext\ZyRabbit.Enrichers.HttpContext.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit\ZyRabbit.csproj" />
@@ -13,6 +17,12 @@
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Publish\ZyRabbit.Operations.Publish.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Operations.Request\ZyRabbit.Operations.Request.csproj" />
     <ProjectReference Include="..\ZyRabbit.Messages.Sample\ZyRabbit.Messages.Sample.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

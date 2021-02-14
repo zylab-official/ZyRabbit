@@ -12,7 +12,9 @@ namespace ZyRabbit.Enrichers.Polly.Middleware
 	public class ExchangeDeclareMiddleware : Pipe.Middleware.ExchangeDeclareMiddleware
 	{
 		public ExchangeDeclareMiddleware(ITopologyProvider topologyProvider, ILogger<Pipe.Middleware.ExchangeDeclareMiddleware> logger, ExchangeDeclareOptions options = null)
-			: base(topologyProvider, logger, options) { }
+			: base(topologyProvider, logger, options)
+		{
+		}
 
 		protected override Task DeclareExchangeAsync(ExchangeDeclaration exchange, IPipeContext context, CancellationToken token)
 		{

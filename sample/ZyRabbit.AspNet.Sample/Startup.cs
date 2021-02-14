@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -13,17 +12,19 @@ using ZyRabbit.Enrichers.HttpContext;
 using ZyRabbit.Enrichers.MessageContext;
 using ZyRabbit.Instantiation;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace ZyRabbit.AspNet.Sample
 {
 	public class Startup
 	{
+		private readonly IConfiguration _configuration;
+
 		public Startup(IConfiguration configuration)
 		{
-			Configuration = configuration;
+			_configuration = configuration;
 		}
-
-		public IConfiguration Configuration { get; }
 
 		public void ConfigureServices(IServiceCollection services)
 		{
@@ -41,8 +42,15 @@ namespace ZyRabbit.AspNet.Sample
 								{
 									Source = c.GetHttpContext().Request.GetDisplayUrl()
 								};
-							})
+							}),
+						DependencyInjection = register =>
+						{
+							register.AddSingleton<IServiceProvider, IServiceProvider>(_ => services.BuildServiceProvider());
+							register.AddSingleton(typeof(ILogger<>), typeof(LoggerProxy<>));
+							register.AddSingleton<ILogger, LoggerProxy>();
+						}
 					})
+				.AddZyRabbit()
 				.AddControllers();
 		}
 
@@ -63,12 +71,64 @@ namespace ZyRabbit.AspNet.Sample
 
 		private ZyRabbitConfiguration GetZyRabbitConfiguration()
 		{
-			var section = Configuration.GetSection("ZyRabbit");
-			if (!section.GetChildren().Any())
+			const string sectionName = "ZyRabbit";
+			var section = _configuration.GetSection(sectionName);
+			if (!section.Exists())
 			{
-				throw new ArgumentException($"Unable to configuration section 'ZyRabbit'. Make sure it exists in the provided configuration");
+				throw new ArgumentException($"Unable to configuration section '{sectionName}'. Make sure it exists in the provided configuration");
 			}
+
 			return section.Get<ZyRabbitConfiguration>();
+		}
+
+		private class LoggerProxy<T> : ILogger<T>
+		{
+			private readonly ILogger<T> _logger;
+
+			public LoggerProxy(IServiceProvider serviceProvider)
+			{
+				_logger = serviceProvider.GetRequiredService<ILogger<T>>();
+			}
+
+			public IDisposable BeginScope<TState>(TState state)
+			{
+				return _logger.BeginScope<TState>(state);
+			}
+
+			public bool IsEnabled(LogLevel logLevel)
+			{
+				return _logger.IsEnabled(logLevel);
+			}
+
+			public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+			{
+				_logger.Log(logLevel, eventId, state, exception, formatter);
+			}
+		}
+
+		private class LoggerProxy : ILogger
+		{
+			private readonly ILogger _logger;
+
+			public LoggerProxy(IServiceProvider serviceProvider)
+			{
+				_logger = serviceProvider.GetRequiredService<ILogger>();
+			}
+
+			public IDisposable BeginScope<TState>(TState state)
+			{
+				return _logger.BeginScope<TState>(state);
+			}
+
+			public bool IsEnabled(LogLevel logLevel)
+			{
+				return _logger.IsEnabled(logLevel);
+			}
+
+			public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+			{
+				_logger.Log(logLevel, eventId, state, exception, formatter);
+			}
 		}
 	}
 }
