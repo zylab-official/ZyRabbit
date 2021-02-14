@@ -13,7 +13,6 @@ using ZyRabbit.Enrichers.MessageContext;
 using ZyRabbit.Instantiation;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace ZyRabbit.AspNet.Sample
 {
@@ -50,7 +49,6 @@ namespace ZyRabbit.AspNet.Sample
 							register.AddSingleton<ILogger, LoggerProxy>();
 						}
 					})
-				.AddZyRabbit()
 				.AddControllers();
 		}
 

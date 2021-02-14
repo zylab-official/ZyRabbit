@@ -10,7 +10,6 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 		{
 			var adapter = new ServiceCollectionAdapter(collection ?? throw new ArgumentNullException(nameof(collection)));
 			adapter.AddZyRabbit(options);
-			options?.DependencyInjection?.Invoke(adapter);
 			return collection;
 		}
 	}
