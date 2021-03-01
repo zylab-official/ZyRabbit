@@ -1,4 +1,5 @@
-﻿using ZyRabbit.Enrichers.Protobuf;
+﻿using ZyRabbit.DependencyInjection;
+using ZyRabbit.Enrichers.Protobuf;
 using ZyRabbit.Instantiation;
 using ZyRabbit.Serialization;
 

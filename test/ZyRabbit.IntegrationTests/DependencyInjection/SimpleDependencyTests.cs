@@ -17,7 +17,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		public async Task Should_Be_Able_To_Publish_Message_From_Resolved_Client()
 		{
 			/* Setup */
-			var container = new SimpleDependencyInjection();
+			using var container = new SimpleDependencyInjection();
 			container.AddZyRabbit();
 
 			/* Test */
@@ -47,7 +47,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		public void Should_Be_Able_To_Resolve_Client_With_Plugins_From_SimpleDependency()
 		{
 			/* Setup */
-			var container = new SimpleDependencyInjection();
+			using var container = new SimpleDependencyInjection();
 			container.AddZyRabbit(new ZyRabbitOptions
 			{
 				Plugins = p => p.UseStateMachine()
@@ -65,13 +65,24 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		public void Should_Be_Able_To_Resolve_Logger()
 		{
 			/* Setup */
-			var container = new SimpleDependencyInjection();
+			using var container = new SimpleDependencyInjection();
 			container.AddZyRabbit();
 
 			/* Test */
 			var logger1 = container.GetService<ILogger<IExclusiveLock>>();
 			var logger2 = container.GetService<ILogger<IExclusiveLock>>();
 			Assert.Same(logger1, logger2);
+		}
+
+		[Fact]
+		public void Should_Be_Able_To_Check_Logger()
+		{
+			/* Setup */
+			using var container = new SimpleDependencyInjection();
+			container.AddZyRabbit();
+
+			/* Test */
+			Assert.True(container.IsRegistered(typeof(ILogger<>)));
 		}
 	}
 }

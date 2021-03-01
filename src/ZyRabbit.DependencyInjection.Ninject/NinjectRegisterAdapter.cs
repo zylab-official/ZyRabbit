@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Ninject;
 
 namespace ZyRabbit.DependencyInjection.Ninject
@@ -12,12 +13,6 @@ namespace ZyRabbit.DependencyInjection.Ninject
 			_kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
 		}
 
-		public IDependencyRegister AddSingleton<TService>(TService instance) where TService : class
-		{
-			_kernel.Bind<TService>().ToConstant(instance);
-			return this;
-		}
-
 		public IDependencyRegister AddSingleton(Type type, Type implementationType)
 		{
 			if (type == null)
@@ -29,34 +24,54 @@ namespace ZyRabbit.DependencyInjection.Ninject
 			return this;
 		}
 
-		IDependencyRegister IDependencyRegister.AddSingleton<TService, TImplementation>(Func<IDependencyResolver, TService> instanceCreator)
+		public bool IsRegistered(Type type)
 		{
+			return _kernel.GetBindings(type).Any();
+		}
+
+		public IDependencyRegister Register(Type type, Type implementationType, Lifetime lifetime)
+		{
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+			if (implementationType == null)
+				throw new ArgumentNullException(nameof(implementationType));
+
+			var binding = _kernel.Bind(type).To(implementationType);
+			ApplyLifetime(binding, lifetime);
+
+			return this;
+		}
+
+		public IDependencyRegister Register<T>(Type type, Func<IDependencyResolver, T> instanceCreator, Lifetime lifetime) where T : class
+		{
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
 			if (instanceCreator == null)
 				throw new ArgumentNullException(nameof(instanceCreator));
 
-			_kernel.Bind<TService>().ToMethod(ctx => instanceCreator(new NinjectResolverAdapter(ctx))).InSingletonScope();
+			var binding = _kernel.Bind(type).ToMethod(ctx => instanceCreator(new NinjectResolverAdapter(ctx)));
+			ApplyLifetime(binding, lifetime);
+
 			return this;
 		}
 
-		IDependencyRegister IDependencyRegister.AddSingleton<TService, TImplementation>()
+		private static void ApplyLifetime<T>(global::Ninject.Syntax.IBindingWhenInNamedWithOrOnSyntax<T> binding, Lifetime lifetime)
 		{
-			_kernel.Bind<TService>().To<TImplementation>().InSingletonScope();
-			return this;
-		}
-
-		IDependencyRegister IDependencyRegister.AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator)
-		{
-			if (instanceCreator == null)
-				throw new ArgumentNullException(nameof(instanceCreator));
-
-			_kernel.Bind<TService>().ToMethod(ctx => instanceCreator(new NinjectResolverAdapter(ctx))).InTransientScope();
-			return this;
-		}
-
-		IDependencyRegister IDependencyRegister.AddTransient<TService, TImplementation>()
-		{
-			_kernel.Bind<TService>().To<TImplementation>().InTransientScope();
-			return this;
+			switch (lifetime)
+			{
+				case Lifetime.Transient:
+					{
+						binding.InTransientScope();
+						break;
+					}
+				case Lifetime.Singelton:
+					{
+						binding.InSingletonScope();
+						break;
+					}
+				default:
+					throw new NotSupportedException($"Lifetime '{lifetime}' is not supported");
+			}
 		}
 	}
 }

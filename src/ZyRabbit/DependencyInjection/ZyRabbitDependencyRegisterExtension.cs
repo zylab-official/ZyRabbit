@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
-using System;
 using System.Linq;
 using ZyRabbit.Channel;
 using ZyRabbit.Channel.Abstraction;
@@ -92,17 +91,29 @@ namespace ZyRabbit.DependencyInjection
 				.AddTransient<IInstanceFactory>(resolver => new InstanceFactory(resolver))
 				.AddSingleton<IPipeContextFactory, PipeContextFactory>()
 				.AddTransient<IExtendedPipeBuilder, PipeBuilder>(resolver => new PipeBuilder(resolver))
-				.AddSingleton<IPipeBuilderFactory>(provider => new PipeBuilderFactory(provider))
-				.AddSingleton(typeof(ILogger<>), typeof(Logger<>))
-				.AddSingleton<ILoggerFactory, NullLoggerFactory>()
-				.AddSingleton<ILogger, NullLogger>(resolver => NullLogger.Instance);
+				.AddSingleton<IPipeBuilderFactory>(provider => new PipeBuilderFactory(provider));
 
 			var clientBuilder = new ClientBuilder();
 			options?.Plugins?.Invoke(clientBuilder);
 			clientBuilder.DependencyInjection?.Invoke(register);
 			register.AddSingleton(clientBuilder.PipeBuilderAction);
-
 			options?.DependencyInjection?.Invoke(register);
+
+			if (!register.IsRegistered(typeof(ILogger<>)))
+			{
+				register.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+			}
+
+			if (!register.IsRegistered(typeof(ILogger)))
+			{
+				register.AddSingleton<ILogger, NullLogger>(resolver => NullLogger.Instance);
+			}
+
+			if (!register.IsRegistered(typeof(ILoggerFactory)))
+			{
+				register.AddSingleton<ILoggerFactory, NullLoggerFactory>();
+			}
+
 			return register;
 		}
 	}

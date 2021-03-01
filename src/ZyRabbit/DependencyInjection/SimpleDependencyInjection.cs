@@ -6,62 +6,21 @@ using System.Reflection;
 
 namespace ZyRabbit.DependencyInjection
 {
-	public class SimpleDependencyInjection : IDependencyRegister, IDependencyResolver
+	public class SimpleDependencyInjection : IDependencyRegister, IDependencyResolver, IDisposable
 	{
-		private readonly Dictionary<Type, Func<IDependencyResolver, Type, object>> _registrations = new Dictionary<Type, Func<IDependencyResolver, Type, object>>();
-
-		public IDependencyRegister AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator) where TService : class where TImplementation : class, TService
-		{
-			if (instanceCreator == null)
-				throw new ArgumentNullException(nameof(instanceCreator));
-
-			_registrations[typeof(TService)] = (resolver, type) => instanceCreator(resolver);
-			return this;
-		}
-
-		public IDependencyRegister AddTransient<TService, TImplementation>() where TImplementation : class, TService where TService : class
-		{
-			AddTransient<TService, TImplementation>(resolver => GetService(typeof(TImplementation)) as TImplementation);
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton<TService>(TService instance) where TService : class
-		{
-			AddTransient<TService, TService>(resolver => instance);
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton<TService, TImplementation>(Func<IDependencyResolver, TService> instanceCreator) where TImplementation : class, TService where TService : class
-		{
-			if (instanceCreator == null)
-				throw new ArgumentNullException(nameof(instanceCreator));
-
-			var lazy = new Lazy<TImplementation>(() => (TImplementation)instanceCreator(this));
-			AddTransient<TService,TImplementation>(resolver => lazy.Value);
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton<TService, TImplementation>() where TImplementation : class, TService where TService : class
-		{
-			var lazy = new Lazy<TImplementation>(() =>
-			{
-				var type = typeof(TImplementation);
-				return (TImplementation)CreateInstance(type, Enumerable.Empty<object>());
-			});
-			AddTransient<TService, TImplementation>(resolver => lazy.Value);
-			return this;
-		}
-
-		public TService GetService<TService>(params object[] additional)
-		{
-			return (TService)GetService(typeof(TService), additional);
-		}
-
 		private enum SearchResult
 		{
 			NotFound,
 			Activation,
 			Factory
+		}
+
+		private readonly Dictionary<Type, Func<IDependencyResolver, Type, object>> _registrations = new Dictionary<Type, Func<IDependencyResolver, Type, object>>();
+		private readonly ConcurrentDictionary<Type, object> _singletonInstances = new ConcurrentDictionary<Type, object>();
+
+		public TService GetService<TService>(params object[] additional)
+		{
+			return (TService)GetService(typeof(TService), additional);
 		}
 
 		private (Type, SearchResult) FindRegistrationKey(Type type)
@@ -156,29 +115,93 @@ namespace ZyRabbit.DependencyInjection
 			return ctor.Invoke(dependencies);
 		}
 
-		private readonly ConcurrentDictionary<Type, object> _singletonInstances = new ConcurrentDictionary<Type, object>();
-
-		public IDependencyRegister AddSingleton(Type type, Type implementationType)
+		public IDependencyRegister Register(Type serviceType, Type implementationType, Lifetime lifetime)
 		{
-			if (type == null)
-				throw new ArgumentNullException(nameof(type));
+			if (serviceType == null)
+				throw new ArgumentNullException(nameof(serviceType));
 			if (implementationType == null)
 				throw new ArgumentNullException(nameof(implementationType));
 
-			_registrations[type] = (resolver, requestedType) => {
-				var result = _singletonInstances.GetOrAdd(requestedType, _ =>
+			object CreateInstanceFromType(Type requestedType)
+			{
+				if (implementationType.IsGenericTypeDefinition)
 				{
-					if (implementationType.IsGenericTypeDefinition)
-					{						
-						var ts = implementationType.MakeGenericType(requestedType.GetGenericArguments());
-						return CreateInstance(ts, Enumerable.Empty<object>());
-					}
+					var ts = implementationType.MakeGenericType(requestedType.GetGenericArguments());
+					return CreateInstance(ts, Enumerable.Empty<object>());
+				}
 
-					return CreateInstance(requestedType, Enumerable.Empty<object>());
-				});
-				return result;
-			};
+				return CreateInstance(implementationType, Enumerable.Empty<object>());
+			}
+
+			switch (lifetime)
+			{
+				case Lifetime.Transient:
+					{
+						_registrations[serviceType] = (resolver, requestedType) => CreateInstanceFromType(requestedType);
+						break;
+					}
+				case Lifetime.Singelton:
+					{
+						_registrations[serviceType] = (resolver, requestedType) =>
+						{
+							var result = _singletonInstances.GetOrAdd(requestedType, key =>	CreateInstanceFromType(key));
+							return result;
+						};
+
+						break;
+					}
+				default:
+					throw new NotSupportedException($"Lifetime '{lifetime}' is not supported");
+			}
+
 			return this;
+		}
+
+		public IDependencyRegister Register<T>(Type serviceType, Func<IDependencyResolver, T> instanceCreator, Lifetime lifetime) where T : class
+		{
+			if (serviceType == null)
+				throw new ArgumentNullException(nameof(serviceType));
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
+
+			switch (lifetime)
+			{
+				case Lifetime.Transient:
+					{
+						_registrations[serviceType] = (resolver, type) => instanceCreator(resolver);
+						break;
+					}
+				case Lifetime.Singelton:
+					{
+						_registrations[serviceType] = (resolver, requestedType) =>
+						{
+							var result = _singletonInstances.GetOrAdd(requestedType, _ =>
+							{
+								return instanceCreator(resolver);
+							});
+							return result;
+						};
+						break;
+					}
+				default:
+					throw new NotSupportedException($"Lifetime '{lifetime}' is not supported");
+			}
+
+			return this;
+		}
+
+		public bool IsRegistered(Type type)
+		{
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+
+			return _registrations.ContainsKey(type);
+		}
+
+		public void Dispose()
+		{
+			_singletonInstances.Clear();
+			_registrations.Clear();
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using ZyRabbit.Common;
+using ZyRabbit.DependencyInjection;
 using ZyRabbit.Instantiation;
 using ZyRabbit.Middleware;
 

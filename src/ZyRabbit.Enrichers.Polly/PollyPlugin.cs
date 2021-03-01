@@ -1,5 +1,6 @@
 ﻿using System;
 using ZyRabbit.Channel.Abstraction;
+using ZyRabbit.DependencyInjection;
 using ZyRabbit.Instantiation;
 using ZyRabbit.Pipe;
 using ZyRabbit.Pipe.Middleware;

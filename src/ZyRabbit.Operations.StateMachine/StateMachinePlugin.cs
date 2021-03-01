@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ZyRabbit.DependencyInjection;
 using ZyRabbit.Instantiation;
 using ZyRabbit.Operations.StateMachine;
 using ZyRabbit.Operations.StateMachine.Core;
