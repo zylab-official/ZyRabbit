@@ -1,14 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using ZyRabbit.Configuration;
-using ZyRabbit.Instantiation;
-using Xunit;
-using ZyRabbit.IntegrationTests.TestMessages;
-using ZyRabbit.Common;
-using Microsoft.Extensions.DependencyInjection;
-using ZyRabbit.DependencyInjection.ServiceCollection;
-using RabbitMQ.Client.Exceptions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client.Exceptions;
+using System.Threading.Tasks;
+using Xunit;
+using ZyRabbit.Common;
+using ZyRabbit.Configuration;
+using ZyRabbit.DependencyInjection.ServiceCollection;
+using ZyRabbit.IntegrationTests.TestMessages;
+using ZyRabbit.Instantiation;
 using ZyRabbit.Operations.StateMachine.Middleware;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
@@ -67,11 +66,11 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Test */
 			var client = provider.GetService<IBusClient>();
-			var disposer = provider.GetService<IResourceDisposer>();
 			var middleware = provider.GetService<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
-			disposer.Dispose();
+			Assert.NotNull(client);
+			Assert.NotNull(middleware);
 		}
 
 		[Fact]
@@ -86,6 +85,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			var logger1 = provider.GetService<ILogger<IExclusiveLock>>();
 			var logger2 = provider.GetService<ILogger<IExclusiveLock>>();
 			Assert.Same(logger1, logger2);
+			Assert.NotNull(logger1);
 		}
 	}
 }

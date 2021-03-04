@@ -55,11 +55,11 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Test */
 			var client = container.GetService<IBusClient>();
-			var disposer = container.GetService<IResourceDisposer>();
 			var middleware = container.GetService<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
-			disposer.Dispose();
+			Assert.NotNull(client);
+			Assert.NotNull(middleware);
 		}
 
 		[Fact]
@@ -73,6 +73,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			var logger1 = container.GetService<ILogger<IExclusiveLock>>();
 			var logger2 = container.GetService<ILogger<IExclusiveLock>>();
 			Assert.Same(logger1, logger2);
+			Assert.NotNull(logger1);
 		}
 
 		[Fact]

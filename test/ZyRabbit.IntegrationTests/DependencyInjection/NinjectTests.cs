@@ -63,11 +63,11 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Test */
 			var client = kernel.Get<IBusClient>();
-			var disposer = kernel.Get<IResourceDisposer>();
 			var middleware = kernel.Get<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
-			disposer.Dispose();
+			Assert.NotNull(client);
+			Assert.NotNull(middleware);
 		}
 
 		[Fact]
@@ -81,6 +81,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			var logger1 = kernel.Get<ILogger<IExclusiveLock>>();
 			var logger2 = kernel.Get<ILogger<IExclusiveLock>>();
 			Assert.Same(logger1, logger2);
+			Assert.NotNull(logger1);
 		}
 	}
 }

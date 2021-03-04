@@ -9,7 +9,6 @@ using ZyRabbit.IntegrationTests.TestMessages;
 using Xunit;
 using Microsoft.Extensions.Logging;
 using ZyRabbit.Operations.StateMachine.Middleware;
-using ZyRabbit.Operations.StateMachine.Core;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -67,11 +66,11 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Test */
 			var client = container.Resolve<IBusClient>();
-			var disposer = container.Resolve<IResourceDisposer>();
 			var middleware = container.Resolve<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
-			disposer.Dispose();
+			Assert.NotNull(client);
+			Assert.NotNull(middleware);
 		}
 
 		[Fact]
@@ -86,6 +85,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			var logger1 = container.Resolve<ILogger<IExclusiveLock>>();
 			var logger2 = container.Resolve<ILogger<IExclusiveLock>>();
 			Assert.Same(logger1, logger2);
+			Assert.NotNull(logger1);
 		}
 	}
 }
