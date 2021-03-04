@@ -48,12 +48,12 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 			{
 				case Lifetime.Transient:
 					{
-						_collection.AddTransient(c => instanceCreator(new ServiceProviderAdapter(c)));
+						_collection.Add(new ServiceDescriptor(type, c => instanceCreator(new ServiceProviderAdapter(c)), ServiceLifetime.Transient));
 						break;
 					}
 				case Lifetime.Singelton:
 					{
-						_collection.AddSingleton(c => instanceCreator(new ServiceProviderAdapter(c)));
+						_collection.Add(new ServiceDescriptor(type, c => instanceCreator(new ServiceProviderAdapter(c)), ServiceLifetime.Singleton));
 						break;
 					}
 				default:
