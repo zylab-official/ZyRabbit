@@ -71,7 +71,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 
 			var binding = _builder
 				.Register(context => instanceCreator(new ComponentContextAdapter(context.Resolve<IComponentContext>())))
-				.As<T>();
+				.As(type);
 
 			switch (lifetime)
 			{

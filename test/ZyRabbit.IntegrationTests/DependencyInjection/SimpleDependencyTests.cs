@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using ZyRabbit.Configuration;
 using ZyRabbit.Instantiation;
 using Xunit;
@@ -8,6 +7,7 @@ using ZyRabbit.Common;
 using ZyRabbit.IntegrationTests.TestMessages;
 using RabbitMQ.Client.Exceptions;
 using Microsoft.Extensions.Logging;
+using ZyRabbit.Operations.StateMachine.Middleware;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -56,6 +56,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			/* Test */
 			var client = container.GetService<IBusClient>();
 			var disposer = container.GetService<IResourceDisposer>();
+			var middleware = container.GetService<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
 			disposer.Dispose();

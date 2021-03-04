@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Stateless" Version="3.0.0" />
+    <PackageReference Include="Stateless" Version="5.10.1" />
   </ItemGroup>
 
 </Project>

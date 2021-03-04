@@ -8,6 +8,8 @@ using ZyRabbit.Instantiation;
 using ZyRabbit.IntegrationTests.TestMessages;
 using Xunit;
 using Microsoft.Extensions.Logging;
+using ZyRabbit.Operations.StateMachine.Middleware;
+using ZyRabbit.Operations.StateMachine.Core;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -19,7 +21,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			/* Setup */
 			var builder = new ContainerBuilder();
 			builder.RegisterZyRabbit();
-			var container = builder.Build();
+			using var container = builder.Build();
 
 			/* Test */
 			var client = container.Resolve<IBusClient>();
@@ -46,7 +48,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 				{
 					ClientConfiguration = config
 				});
-				var container = builder.Build();
+				using var container = builder.Build();
 				var client = container.Resolve<IBusClient>();
 				await client.CreateChannelAsync();
 			});
@@ -61,11 +63,12 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			{
 				Plugins = p => p.UseStateMachine()
 			});
-			var container = builder.Build();
+			using var container = builder.Build();
 
 			/* Test */
 			var client = container.Resolve<IBusClient>();
 			var disposer = container.Resolve<IResourceDisposer>();
+			var middleware = container.Resolve<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
 			disposer.Dispose();
@@ -77,7 +80,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			/* Setup */
 			var builder = new ContainerBuilder();
 			builder.RegisterZyRabbit();
-			var container = builder.Build();
+			using var container = builder.Build();
 
 			/* Test */
 			var logger1 = container.Resolve<ILogger<IExclusiveLock>>();

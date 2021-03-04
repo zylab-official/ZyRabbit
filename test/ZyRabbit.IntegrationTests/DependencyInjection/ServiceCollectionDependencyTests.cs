@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ZyRabbit.DependencyInjection.ServiceCollection;
 using RabbitMQ.Client.Exceptions;
 using Microsoft.Extensions.Logging;
+using ZyRabbit.Operations.StateMachine.Middleware;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -20,7 +21,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			/* Setup */
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddZyRabbit();
-			var provider = serviceCollection.BuildServiceProvider();
+			using var provider = serviceCollection.BuildServiceProvider();
 
 			/* Test */
 			var client = provider.GetService<IBusClient>();
@@ -47,7 +48,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			/* Test */
 			await Assert.ThrowsAnyAsync<BrokerUnreachableException>(async () =>
 			{
-				var provider = serviceCollection.BuildServiceProvider();
+				using var provider = serviceCollection.BuildServiceProvider();
 				var client = provider.GetService<IBusClient>();
 				await client.CreateChannelAsync();
 			});
@@ -62,11 +63,12 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			{
 				Plugins = p => p.UseStateMachine()
 			});
-			var provider = serviceCollection.BuildServiceProvider();
+			using var provider = serviceCollection.BuildServiceProvider();
 
 			/* Test */
 			var client = provider.GetService<IBusClient>();
 			var disposer = provider.GetService<IResourceDisposer>();
+			var middleware = provider.GetService<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
 			disposer.Dispose();
@@ -78,7 +80,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			/* Setup */
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddZyRabbit();
-			var provider = serviceCollection.BuildServiceProvider();
+			using var provider = serviceCollection.BuildServiceProvider();
 
 			/* Test */
 			var logger1 = provider.GetService<ILogger<IExclusiveLock>>();
