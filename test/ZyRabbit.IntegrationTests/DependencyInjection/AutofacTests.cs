@@ -3,12 +3,16 @@ using Autofac;
 using Autofac.Core;
 using ZyRabbit.Common;
 using ZyRabbit.Configuration;
+using ZyRabbit.DependencyInjection;
 using ZyRabbit.DependencyInjection.Autofac;
 using ZyRabbit.Instantiation;
 using ZyRabbit.IntegrationTests.TestMessages;
 using Xunit;
 using Microsoft.Extensions.Logging;
 using ZyRabbit.Operations.StateMachine.Middleware;
+using ZyRabbit.Pipe.Middleware;
+using System;
+using System.Threading;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -21,12 +25,13 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			var builder = new ContainerBuilder();
 			builder.RegisterZyRabbit();
 			using var container = builder.Build();
+			var adapter = new ComponentContextAdapter(container);
 
 			/* Test */
-			var client = container.Resolve<IBusClient>();
+			var client = adapter.GetService<IBusClient>();
 			await client.PublishAsync(new BasicMessage());
 			await client.DeleteExchangeAsync<BasicMessage>();
-			var disposer = container.Resolve<IResourceDisposer>();
+			var disposer = adapter.GetService<IResourceDisposer>();
 
 			/* Assert */
 			disposer.Dispose();
@@ -48,7 +53,9 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 					ClientConfiguration = config
 				});
 				using var container = builder.Build();
-				var client = container.Resolve<IBusClient>();
+				var adapter = new ComponentContextAdapter(container);
+
+				var client = adapter.GetService<IBusClient>();
 				await client.CreateChannelAsync();
 			});
 		}
@@ -63,10 +70,11 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 				Plugins = p => p.UseStateMachine()
 			});
 			using var container = builder.Build();
+			var adapter = new ComponentContextAdapter(container);
 
 			/* Test */
-			var client = container.Resolve<IBusClient>();
-			var middleware = container.Resolve<RetrieveStateMachineMiddleware>();
+			var client = adapter.GetService<IBusClient>();
+			var middleware = adapter.GetService<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
 			Assert.NotNull(client);
@@ -80,12 +88,40 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			var builder = new ContainerBuilder();
 			builder.RegisterZyRabbit();
 			using var container = builder.Build();
+			var adapter = new ComponentContextAdapter(container);
 
 			/* Test */
-			var logger1 = container.Resolve<ILogger<IExclusiveLock>>();
-			var logger2 = container.Resolve<ILogger<IExclusiveLock>>();
+			var logger1 = adapter.GetService<ILogger<IExclusiveLock>>();
+			var logger2 = adapter.GetService<ILogger<IExclusiveLock>>();
+
+			/* Assert */
 			Assert.Same(logger1, logger2);
 			Assert.NotNull(logger1);
+		}
+
+		[Fact]
+		public async Task Should_Be_Able_To_Resolve_Middleware_With_Parameter()
+		{
+			/* Setup */
+			var builder = new ContainerBuilder();
+			builder.RegisterZyRabbit();
+			using var container = builder.Build();
+			var adapter = new ComponentContextAdapter(container);
+
+			// Configure middleware via options to throw the InvalidOperationException exception
+			var options = new ExchangeDeclareOptions
+			{
+				ThrowOnFailFunc = _ => true
+			};
+
+			/* Test */
+			var middleware = adapter.GetService<ExchangeDeclareMiddleware>(options);
+
+			/* Assert */
+			await Assert.ThrowsAnyAsync<InvalidOperationException>(async () =>
+			{
+				await middleware.InvokeAsync(null, CancellationToken.None);
+			});
 		}
 	}
 }

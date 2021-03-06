@@ -15,11 +15,6 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 		}
 
-		public TService GetService<TService>(params object[] additional)
-		{
-			return (TService)GetService(typeof(TService), additional);
-		}
-
 		public object GetService(Type serviceType, params object[] additional)
 		{
 			if (serviceType == null)

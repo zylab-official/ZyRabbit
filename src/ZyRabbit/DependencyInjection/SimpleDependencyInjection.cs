@@ -18,11 +18,6 @@ namespace ZyRabbit.DependencyInjection
 		private readonly Dictionary<Type, Func<IDependencyResolver, Type, object>> _registrations = new Dictionary<Type, Func<IDependencyResolver, Type, object>>();
 		private readonly ConcurrentDictionary<Type, object> _singletonInstances = new ConcurrentDictionary<Type, object>();
 
-		public TService GetService<TService>(params object[] additional)
-		{
-			return (TService)GetService(typeof(TService), additional);
-		}
-
 		private (Type, SearchResult) FindRegistrationKey(Type type)
 		{
 			if (_registrations.ContainsKey(type))

@@ -9,9 +9,10 @@ using ZyRabbit.DependencyInjection.ServiceCollection;
 using ZyRabbit.IntegrationTests.TestMessages;
 using ZyRabbit.Instantiation;
 using ZyRabbit.Operations.StateMachine.Middleware;
-using ZyRabbit.Operations.StateMachine.Core;
-using System.Linq;
 using ZyRabbit.Pipe.Middleware;
+using ZyRabbit.DependencyInjection;
+using System.Threading;
+using System;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -24,12 +25,13 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddZyRabbit();
 			using var provider = serviceCollection.BuildServiceProvider();
+			var providerAdapter = new ServiceProviderAdapter(provider);
 
 			/* Test */
-			var client = provider.GetService<IBusClient>();
+			var client = providerAdapter.GetService<IBusClient>();
 			await client.PublishAsync(new BasicMessage());
 			await client.DeleteExchangeAsync<BasicMessage>();
-			var disposer = provider.GetService<IResourceDisposer>();
+			var disposer = providerAdapter.GetService<IResourceDisposer>();
 
 			/* Assert */
 			disposer.Dispose();
@@ -51,7 +53,8 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			await Assert.ThrowsAnyAsync<BrokerUnreachableException>(async () =>
 			{
 				using var provider = serviceCollection.BuildServiceProvider();
-				var client = provider.GetService<IBusClient>();
+				var providerAdapter = new ServiceProviderAdapter(provider);
+				var client = providerAdapter.GetService<IBusClient>();
 				await client.CreateChannelAsync();
 			});
 		}
@@ -84,12 +87,40 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddZyRabbit();
 			using var provider = serviceCollection.BuildServiceProvider();
+			var providerAdapter = new ServiceProviderAdapter(provider);
 
 			/* Test */
-			var logger1 = provider.GetService<ILogger<IExclusiveLock>>();
-			var logger2 = provider.GetService<ILogger<IExclusiveLock>>();
+			var logger1 = providerAdapter.GetService<ILogger<IExclusiveLock>>();
+			var logger2 = providerAdapter.GetService<ILogger<IExclusiveLock>>();
+
+			/* Assert */
 			Assert.Same(logger1, logger2);
 			Assert.NotNull(logger1);
+		}
+
+		[Fact]
+		public async Task Should_Be_Able_To_Resolve_Middleware_With_Parameter()
+		{
+			/* Setup */
+			var serviceCollection = new ServiceCollection();
+			serviceCollection.AddZyRabbit();
+			using var provider = serviceCollection.BuildServiceProvider();
+			var providerAdapter = new ServiceProviderAdapter(provider);
+
+			// Configure middleware via options to throw the InvalidOperationException exception
+			var options = new ExchangeDeclareOptions
+			{
+				ThrowOnFailFunc = _ => true
+			};
+
+			/* Test */
+			var middleware = providerAdapter.GetService<ExchangeDeclareMiddleware>(options);
+
+			/* Assert */
+			await Assert.ThrowsAnyAsync<InvalidOperationException>(async () =>
+			{
+				await middleware.InvokeAsync(null, CancellationToken.None);
+			});
 		}
 	}
 }

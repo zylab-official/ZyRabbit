@@ -10,7 +10,6 @@ namespace ZyRabbit.Pipe.Middleware
 	public class ExchangeDeclareOptions
 	{
 		public Func<IPipeContext, ExchangeDeclaration> ExchangeFunc { get; set; }
-		public bool ThrowOnFail { get; set; }
 		public  Func<IPipeContext, bool> ThrowOnFailFunc { get; set; }
 	}
 
@@ -42,7 +41,7 @@ namespace ZyRabbit.Pipe.Middleware
 			{
 				if (GetThrowOnFail(context))
 				{
-					throw new ArgumentNullException(nameof(exchangeCfg));
+					throw new InvalidOperationException("Exchange declaration config was not found");
 				}
 			}
 

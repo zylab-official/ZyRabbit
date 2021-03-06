@@ -1,9 +1,7 @@
 ﻿using Autofac;
 using Autofac.Features.ResolveAnything;
 using System;
-using System.Linq;
 using ZyRabbit.Instantiation;
-using ZyRabbit.Pipe.Middleware;
 
 namespace ZyRabbit.DependencyInjection.Autofac
 {

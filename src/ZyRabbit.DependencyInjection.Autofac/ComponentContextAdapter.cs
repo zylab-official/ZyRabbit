@@ -19,11 +19,6 @@ namespace ZyRabbit.DependencyInjection.Autofac
 			_context = context ?? throw new ArgumentNullException(nameof(context));
 		}
 
-		public TService GetService<TService>(params object[] additional)
-		{
-			return (TService)GetService(typeof(TService), additional);
-		}
-
 		public object GetService(Type serviceType, params object[] additional)
 		{
 			var parameters = additional

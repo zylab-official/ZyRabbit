@@ -8,6 +8,9 @@ using ZyRabbit.IntegrationTests.TestMessages;
 using RabbitMQ.Client.Exceptions;
 using Microsoft.Extensions.Logging;
 using ZyRabbit.Operations.StateMachine.Middleware;
+using ZyRabbit.Pipe.Middleware;
+using System.Threading;
+using System;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -85,6 +88,29 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 
 			/* Test */
 			Assert.True(container.IsRegistered(typeof(ILogger<>)));
+		}
+
+		[Fact]
+		public async Task Should_Be_Able_To_Resolve_Middleware_With_Parameter()
+		{
+			/* Setup */
+			using var container = new SimpleDependencyInjection();
+			container.AddZyRabbit();
+
+			// Configure middleware via options to throw the InvalidOperationException exception
+			var options = new ExchangeDeclareOptions
+			{
+				ThrowOnFailFunc = _ => true
+			};
+
+			/* Test */
+			var middleware = container.GetService<ExchangeDeclareMiddleware>(options);
+
+			/* Assert */
+			await Assert.ThrowsAnyAsync<InvalidOperationException>(async () =>
+			{
+				await middleware.InvokeAsync(null, CancellationToken.None);
+			});
 		}
 	}
 }
