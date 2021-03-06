@@ -20,7 +20,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		public async Task Should_Be_Able_To_Publish_Message_From_Resolved_Client()
 		{
 			/* Setup */
-			using var container = new SimpleDependencyInjection();
+			using var container = new SimpleDependencyInjectionContainer();
 			container.AddZyRabbit();
 
 			/* Test */
@@ -50,7 +50,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		public void Should_Be_Able_To_Resolve_Client_With_Plugins_From_SimpleDependency()
 		{
 			/* Setup */
-			using var container = new SimpleDependencyInjection();
+			using var container = new SimpleDependencyInjectionContainer();
 			container.AddZyRabbit(new ZyRabbitOptions
 			{
 				Plugins = p => p.UseStateMachine()
@@ -69,7 +69,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		public void Should_Be_Able_To_Resolve_Logger()
 		{
 			/* Setup */
-			using var container = new SimpleDependencyInjection();
+			using var container = new SimpleDependencyInjectionContainer();
 			container.AddZyRabbit();
 
 			/* Test */
@@ -83,7 +83,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		public void Should_Be_Able_To_Check_Logger()
 		{
 			/* Setup */
-			using var container = new SimpleDependencyInjection();
+			using var container = new SimpleDependencyInjectionContainer();
 			container.AddZyRabbit();
 
 			/* Test */
@@ -94,7 +94,7 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 		public async Task Should_Be_Able_To_Resolve_Middleware_With_Parameter()
 		{
 			/* Setup */
-			using var container = new SimpleDependencyInjection();
+			using var container = new SimpleDependencyInjectionContainer();
 			container.AddZyRabbit();
 
 			// Configure middleware via options to throw the InvalidOperationException exception

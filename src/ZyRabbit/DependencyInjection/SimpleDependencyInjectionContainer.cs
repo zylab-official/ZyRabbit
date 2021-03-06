@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace ZyRabbit.DependencyInjection
 {
-	public class SimpleDependencyInjection : IDependencyRegister, IDependencyResolver, IDisposable
+	public class SimpleDependencyInjectionContainer : IDependencyRegister, IDependencyResolver, IDisposable
 	{
 		private enum SearchResult
 		{
