@@ -9,6 +9,9 @@ using ZyRabbit.DependencyInjection.ServiceCollection;
 using ZyRabbit.IntegrationTests.TestMessages;
 using ZyRabbit.Instantiation;
 using ZyRabbit.Operations.StateMachine.Middleware;
+using ZyRabbit.Operations.StateMachine.Core;
+using System.Linq;
+using ZyRabbit.Pipe.Middleware;
 
 namespace ZyRabbit.IntegrationTests.DependencyInjection
 {
@@ -63,10 +66,11 @@ namespace ZyRabbit.IntegrationTests.DependencyInjection
 				Plugins = p => p.UseStateMachine()
 			});
 			using var provider = serviceCollection.BuildServiceProvider();
+			var providerAdapter = new ServiceProviderAdapter(provider);
 
 			/* Test */
-			var client = provider.GetService<IBusClient>();
-			var middleware = provider.GetService<RetrieveStateMachineMiddleware>();
+			var client = providerAdapter.GetService<IBusClient>();
+			var middleware = providerAdapter.GetService<RetrieveStateMachineMiddleware>();
 
 			/* Assert */
 			Assert.NotNull(client);

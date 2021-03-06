@@ -12,7 +12,7 @@ using ZyRabbit.Enrichers.HttpContext;
 using ZyRabbit.Enrichers.MessageContext;
 using ZyRabbit.Instantiation;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using ZyRabbit.DependencyInjection;
 
 namespace ZyRabbit.AspNet.Sample
 {
@@ -41,13 +41,7 @@ namespace ZyRabbit.AspNet.Sample
 								{
 									Source = c.GetHttpContext().Request.GetDisplayUrl()
 								};
-							}),
-						DependencyInjection = register =>
-						{
-							register.AddSingleton<IServiceProvider, IServiceProvider>(_ => services.BuildServiceProvider());
-							register.AddSingleton(typeof(ILogger<>), typeof(LoggerProxy<>));
-							register.AddSingleton<ILogger, LoggerProxy>();
-						}
+							})
 					})
 				.AddControllers();
 		}
@@ -77,56 +71,6 @@ namespace ZyRabbit.AspNet.Sample
 			}
 
 			return section.Get<ZyRabbitConfiguration>();
-		}
-
-		private class LoggerProxy<T> : ILogger<T>
-		{
-			private readonly ILogger<T> _logger;
-
-			public LoggerProxy(IServiceProvider serviceProvider)
-			{
-				_logger = serviceProvider.GetRequiredService<ILogger<T>>();
-			}
-
-			public IDisposable BeginScope<TState>(TState state)
-			{
-				return _logger.BeginScope<TState>(state);
-			}
-
-			public bool IsEnabled(LogLevel logLevel)
-			{
-				return _logger.IsEnabled(logLevel);
-			}
-
-			public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-			{
-				_logger.Log(logLevel, eventId, state, exception, formatter);
-			}
-		}
-
-		private class LoggerProxy : ILogger
-		{
-			private readonly ILogger _logger;
-
-			public LoggerProxy(IServiceProvider serviceProvider)
-			{
-				_logger = serviceProvider.GetRequiredService<ILogger>();
-			}
-
-			public IDisposable BeginScope<TState>(TState state)
-			{
-				return _logger.BeginScope<TState>(state);
-			}
-
-			public bool IsEnabled(LogLevel logLevel)
-			{
-				return _logger.IsEnabled(logLevel);
-			}
-
-			public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-			{
-				_logger.Log(logLevel, eventId, state, exception, formatter);
-			}
 		}
 	}
 }
