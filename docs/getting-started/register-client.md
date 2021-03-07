@@ -11,14 +11,14 @@ If no arguments are provided, the local configuration as defined in `ZyRabbitCon
 var raw = ZyRabbitFactory.CreateSingleton();
 ```
 
-### vNext Application Registration
-If the application is bootstrapped from a `vNext` application, the dependencies and client can be registered by using the `AddZyRabbit` extension for `IServiceCollection`
-The package [`ZyRabbit.vNext`](https://www.nuget.org/packages/ZyRabbit.vNext) contains modules and extension methods for registering `ZyRabbit`.
+### Microsoft.Extensions.DependencyInjection Registration
+If the application with Microsoft.Extensions.DependencyInjection, the dependencies and client can be registered by using the `AddZyRabbit` extension for `IServiceCollection`.
+The package [`ZyRabbit.DependencyInjection.ServiceCollection`](https://www.nuget.org/packages/ZyRabbit.DependencyInjection.ServiceCollection) contains modules and extension methods for registering `ZyRabbit`.
 
 ```csharp
 public void ConfigureServices(IServiceCollection services)
 {
-    services.AddZyRabbit(); //optional overrides here, too.
+    services.AddZyRabbit(); // optional overrides here, too.
 }
 ```
 
@@ -30,10 +30,3 @@ var builder = new ContainerBuilder();
 builder.RegisterZyRabbit();
 var container = builder.Build();
 ```
-
-### Ninject Registration
-The package [`ZyRabbit.DependencyInjection.Ninject`](https://www.nuget.org/packages/ZyRabbit.DependencyInjection.Ninject) contains modules and extension methods for registering `ZyRabbit`.
-
-```csharp
-var kernel = new StandardKernel();
-kernel.RegisterZyRabbit();

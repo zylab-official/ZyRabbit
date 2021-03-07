@@ -1,7 +1,7 @@
 # ZyRabbit
 
 ## Quick introduction
-`ZyRabbit` is a modern .NET framework for communication over [RabbitMQ](http://rabbitmq.com/). The modular design and middleware oriented architecture makes the client highly customizable while providing sensible default for topology, routing and more. Documentation for version 2.x of the is currently found under [`/docs`](https://github.com/zylab-official/ZyRabbit/tree/2.0/docs).
+`ZyRabbit` is a modern .NET framework for communication over [RabbitMQ](http://rabbitmq.com/). The modular design and middleware oriented architecture makes the client highly customizable while providing sensible default for topology, routing and more. Documentation is currently found under [`/docs`](https://github.com/zylab-official/ZyRabbit/tree/master/docs).
 
 ### Configure, enrich and extend
 
