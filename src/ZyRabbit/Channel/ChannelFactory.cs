@@ -2,27 +2,28 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Configuration;
 using ZyRabbit.Exceptions;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Channel
 {
 	public class ChannelFactory : IChannelFactory
 	{
-		private readonly ILog _logger = LogProvider.For<ChannelFactory>();
+		protected readonly ILogger<ChannelFactory> Logger;
 		protected readonly IConnectionFactory ConnectionFactory;
 		protected readonly ZyRabbitConfiguration ClientConfig;
 		protected readonly ConcurrentBag<IModel> Channels;
 		protected IConnection Connection;
 
-		public ChannelFactory(IConnectionFactory connectionFactory, ZyRabbitConfiguration config)
+		public ChannelFactory(IConnectionFactory connectionFactory, ZyRabbitConfiguration config, ILogger<ChannelFactory> logger)
 		{
-			ConnectionFactory = connectionFactory;
-			ClientConfig = config;
+			ConnectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+			ClientConfig = config ?? throw new ArgumentNullException(nameof(config));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			Channels = new ConcurrentBag<IModel>();
 		}
 
@@ -30,17 +31,17 @@ namespace ZyRabbit.Channel
 		{
 			try
 			{
-				_logger.Debug("Creating a new connection for {hostNameCount} hosts.", ClientConfig.Hostnames.Count);
+				Logger.LogInformation("Creating a new connection for {hostNameCount} hosts.", ClientConfig.Hostnames.Count);
 				Connection = ConnectionFactory.CreateConnection(ClientConfig.Hostnames, ClientConfig.ClientProvidedName);
 				Connection.ConnectionShutdown += (sender, args) =>
-					_logger.Warn("Connection was shutdown by {Initiator}. ReplyText {ReplyText}", args.Initiator, args.ReplyText);
+					Logger.LogWarning("Connection was shutdown by {Initiator}. ReplyText {ReplyText}", args.Initiator, args.ReplyText);
 			}
 			catch (BrokerUnreachableException e)
 			{
-				_logger.Info("Unable to connect to broker", e);
+				Logger.LogError("Unable to connect to broker", e);
 				throw;
 			}
-			return Task.FromResult(true);
+			return Task.CompletedTask;
 		}
 
 		public virtual async Task<IModel> CreateChannelAsync(CancellationToken token = default(CancellationToken))
@@ -61,26 +62,26 @@ namespace ZyRabbit.Channel
 			}
 			if (Connection.IsOpen)
 			{
-				_logger.Debug("Existing connection is open and will be used.");
+				Logger.LogDebug("Existing connection is open and will be used.");
 				return Connection;
 			}
-			_logger.Info("The existing connection is not open.");
+			Logger.LogInformation("The existing connection is not open.");
 
 			if (Connection.CloseReason != null &&Connection.CloseReason.Initiator == ShutdownInitiator.Application)
 			{
-				_logger.Info("Connection is closed with Application as initiator. It will not be recovered.");
+				Logger.LogWarning("Connection is closed with Application as initiator. It will not be recovered.");
 				Connection.Dispose();
 				throw new ChannelAvailabilityException("Closed connection initiated by the Application. A new connection will not be created, and no channel can be created.");
 			}
 
 			if (!(Connection is IRecoverable recoverable))
 			{
-				_logger.Info("Connection is not recoverable");
+				Logger.LogWarning("Connection is not recoverable");
 				Connection.Dispose();
 				throw new ChannelAvailabilityException("The non recoverable connection is closed. A channel can not be created.");
 			}
 
-			_logger.Debug("Connection is recoverable. Waiting for 'Recovery' event to be triggered. ");
+			Logger.LogDebug("Connection is recoverable. Waiting for 'Recovery' event to be triggered. ");
 			var recoverTcs = new TaskCompletionSource<IConnection>();
 			token.Register(() => recoverTcs.TrySetCanceled());
 
@@ -91,7 +92,7 @@ namespace ZyRabbit.Channel
 				{
 					return;
 				}
-				_logger.Info("Connection has been recovered!");
+				Logger.LogInformation("Connection has been recovered!");
 				recoverTcs.TrySetResult(recoverable as IConnection);
 				recoverable.Recovery -= completeTask;
 			};

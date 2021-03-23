@@ -1,6 +1,6 @@
 ﻿using System;
 using Autofac;
-using ZyRabbit.DependencyInjection;
+using Autofac.Core;
 
 namespace ZyRabbit.DependencyInjection.Autofac
 {
@@ -10,52 +10,94 @@ namespace ZyRabbit.DependencyInjection.Autofac
 
 		public ContainerBuilderAdapter(ContainerBuilder builder)
 		{
-			_builder = builder;
+			_builder = builder ?? throw new ArgumentNullException(nameof(builder));
 		}
 
-		public IDependencyRegister AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator) where TService : class where TImplementation : class, TService
+		public IDependencyRegister Register(Type type, Type implementationType, Lifetime lifetime)
 		{
-			_builder
-				.Register<TImplementation>(context => instanceCreator(new ComponentContextAdapter(context.Resolve<IComponentContext>())))
-				.As<TService>()
-				.InstancePerDependency();
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+			if (implementationType == null)
+				throw new ArgumentNullException(nameof(implementationType));
+
+			if (type.IsGenericTypeDefinition)
+			{
+				var binding = _builder.RegisterGeneric(implementationType).As(type);
+				switch (lifetime)
+				{
+					case Lifetime.Transient:
+						{
+							binding.InstancePerDependency();
+							break;
+						}
+					case Lifetime.Singelton:
+						{
+							binding.SingleInstance();
+							break;
+						}
+					default:
+						throw new NotSupportedException($"Lifetime '{lifetime}' is not supported");
+				}
+			}
+			else
+			{
+				var binding = _builder.RegisterType(implementationType).As(type);
+				switch (lifetime)
+				{
+					case Lifetime.Transient:
+						{
+							binding.InstancePerDependency();
+							break;
+						}
+					case Lifetime.Singelton:
+						{
+							binding.SingleInstance();
+							break;
+						}
+					default:
+						throw new NotSupportedException($"Lifetime '{lifetime}' is not supported");
+				}
+			}
+
 			return this;
 		}
 
-		public IDependencyRegister AddTransient<TService, TImplementation>() where TService : class where TImplementation : class, TService
+		public IDependencyRegister Register<T>(Type type, Func<IDependencyResolver, T> instanceCreator, Lifetime lifetime) where T : class
 		{
-			_builder
-				.RegisterType<TImplementation>()
-				.As<TService>()
-				.InstancePerDependency();
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
+
+			var binding = _builder
+				.Register(context => instanceCreator(new ComponentContextAdapter(context.Resolve<IComponentContext>())))
+				.As(type);
+
+			switch (lifetime)
+			{
+				case Lifetime.Transient:
+					{
+						binding.InstancePerDependency();
+						break;
+					}
+				case Lifetime.Singelton:
+					{
+						binding.SingleInstance();
+						break;
+					}
+				default:
+					throw new NotSupportedException($"Lifetime '{lifetime}' is not supported");
+			}
+
 			return this;
 		}
 
-		public IDependencyRegister AddSingleton<TService>(TService instance) where TService : class
+		public bool IsRegistered(Type type)
 		{
-			_builder
-				.Register<TService>(context => instance)
-				.As<TService>()
-				.SingleInstance();
-			return this;
-		}
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
 
-		public IDependencyRegister AddSingleton<TService, TImplementation>(Func<IDependencyResolver, TService> instanceCreator) where TService : class where TImplementation : class, TService
-		{
-			_builder
-				.Register<TService>(context => instanceCreator(new ComponentContextAdapter(context.Resolve<IComponentContext>())))
-				.As<TService>()
-				.SingleInstance();
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton<TService, TImplementation>() where TService : class where TImplementation : class, TService
-		{
-			_builder
-				.RegisterType<TImplementation>()
-				.As<TService>()
-				.SingleInstance();
-			return this;
+			return _builder.ComponentRegistryBuilder.IsRegistered(new TypedService(type));
 		}
 	}
 }

@@ -3,29 +3,30 @@
   <PropertyGroup>
     <Description>A modern framework for communication over RabbitMq.</Description>
     <AssemblyTitle>ZyRabbit</AssemblyTitle>
-	  <VersionPrefix>1.0.0</VersionPrefix>
-    <Authors>pardahlman;enrique-avalon;matei.navidad;ivan.abragimovich</Authors>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Authors>pardahlman;enrique-avalon;matei.navidad;code-bringer</Authors>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>ZyRabbit</AssemblyName>
     <PackageId>ZyRabbit</PackageId>
     <PackageTags>rabbitmq;zyrabbit;amqp</PackageTags>
-	<GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <DefineConstants>LIBLOG_PORTABLE</DefineConstants>
   </PropertyGroup>
-	<ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="5.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
-	<ItemGroup>
-	  <None Include="..\..\icon.png">
-	    <Pack>True</Pack>
-	    <PackagePath></PackagePath>
-	  </None>
-	</ItemGroup>
-	<PropertyGroup>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageIcon>icon.png</PackageIcon>
-	</PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
 </Project>

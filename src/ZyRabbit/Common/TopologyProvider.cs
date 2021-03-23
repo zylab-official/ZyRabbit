@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Configuration.Exchange;
 using ZyRabbit.Configuration.Queue;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Common
 {
@@ -19,7 +19,7 @@ namespace ZyRabbit.Common
 		Task BindQueueAsync(string queue, string exchange, string routingKey, IDictionary<string, object> arguments);
 		Task UnbindQueueAsync(string queue, string exchange, string routingKey, IDictionary<string, object> arguments);
 		bool IsDeclared(ExchangeDeclaration exchange);
-		bool IsDeclared(QueueDeclaration exchange);
+		bool IsDeclared(QueueDeclaration queue);
 	}
 
 	public class TopologyProvider : ITopologyProvider, IDisposable
@@ -32,11 +32,12 @@ namespace ZyRabbit.Common
 		private readonly List<string> _initQueues;
 		private readonly List<string> _queueBinds;
 		private readonly ConcurrentQueue<ScheduledTopologyTask> _topologyTasks;
-		private readonly ILog _logger = LogProvider.For<TopologyProvider>();
+		private readonly ILogger<TopologyProvider> _logger;
 
-		public TopologyProvider(IChannelFactory channelFactory)
+		public TopologyProvider(IChannelFactory channelFactory, ILogger<TopologyProvider> logger)
 		{
-			_channelFactory = channelFactory;
+			_channelFactory = channelFactory ?? throw new ArgumentNullException(nameof(channelFactory));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_initExchanges = new List<string>();
 			_initQueues = new List<string>();
 			_queueBinds = new List<string>();
@@ -130,7 +131,7 @@ namespace ZyRabbit.Common
 				return;
 			}
 
-			_logger.Info("Binding queue {queueName} to exchange {exchangeName} with routing key {routingKey}", bind.Queue, bind.Exchange, bind.RoutingKey);
+			_logger.LogInformation("Binding queue {queueName} to exchange {exchangeName} with routing key {routingKey}", bind.Queue, bind.Exchange, bind.RoutingKey);
 
 			var channel = GetOrCreateChannel();
 			channel.QueueBind(
@@ -144,7 +145,7 @@ namespace ZyRabbit.Common
 
 		private void UnbindQueueFromExchange(ScheduledUnbindQueueTask bind)
 		{
-			_logger.Info("Unbinding queue {queueName} from exchange {exchangeName} with routing key {routingKey}", bind.Queue, bind.Exchange, bind.RoutingKey);
+			_logger.LogInformation("Unbinding queue {queueName} from exchange {exchangeName} with routing key {routingKey}", bind.Queue, bind.Exchange, bind.RoutingKey);
 
 			var channel = GetOrCreateChannel();
 			channel.QueueUnbind(
@@ -189,7 +190,7 @@ namespace ZyRabbit.Common
 				return;
 			}
 
-			_logger.Info("Declaring queue {queueName}.", queue.Name);
+			_logger.LogInformation("Declaring queue {queueName}.", queue.Name);
 
 			var channel = GetOrCreateChannel();
 			channel.QueueDeclare(
@@ -212,7 +213,7 @@ namespace ZyRabbit.Common
 				return;
 			}
 
-			_logger.Info("Declaring exchange {exchangeName}.", exchange.Name);
+			_logger.LogInformation("Declaring exchange {exchangeName}.", exchange.Name);
 			var channel = GetOrCreateChannel();
 			channel.ExchangeDeclare(
 				exchange.Name,
@@ -246,7 +247,7 @@ namespace ZyRabbit.Common
 					}
 					catch (Exception e)
 					{
-						_logger.Error(e, "Unable to declare exchange {exchangeName}", exchange.Declaration.Name);
+						_logger.LogError(e, "Unable to declare exchange {exchangeName}", exchange.Declaration.Name);
 						exchange.TaskCompletionSource.TrySetException(e);
 					}
 
@@ -263,7 +264,7 @@ namespace ZyRabbit.Common
 					}
 					catch (Exception e)
 					{
-						_logger.Error(e, "Unable to declare queue");
+						_logger.LogError(e, "Unable to declare queue");
 						queue.TaskCompletionSource.TrySetException(e);
 					}
 
@@ -280,7 +281,7 @@ namespace ZyRabbit.Common
 					}
 					catch (Exception e)
 					{
-						_logger.Error(e, "Unable to bind queue");
+						_logger.LogError(e, "Unable to bind queue");
 						bind.TaskCompletionSource.TrySetException(e);
 					}
 					continue;
@@ -296,12 +297,12 @@ namespace ZyRabbit.Common
 					}
 					catch (Exception e)
 					{
-						_logger.Error(e, "Unable to unbind queue");
+						_logger.LogError(e, "Unable to unbind queue");
 						unbind.TaskCompletionSource.TrySetException(e);
 					}
 				}
 			}
-			_logger.Debug("Done processing topology work.");
+			_logger.LogDebug("Done processing topology work.");
 			Monitor.Exit(_processLock);
 		}
 

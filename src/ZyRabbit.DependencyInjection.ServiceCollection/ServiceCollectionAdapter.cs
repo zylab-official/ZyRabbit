@@ -1,57 +1,74 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ZyRabbit.DependencyInjection.ServiceCollection
 {
 	public class ServiceCollectionAdapter : IDependencyRegister
 	{
-		public IServiceCollection Collection { get; set; }
+		private readonly IServiceCollection _collection;
 
 		public ServiceCollectionAdapter(IServiceCollection collection)
 		{
-			Collection = collection;
+			_collection = collection ?? throw new ArgumentNullException(nameof(collection));
 		}
 
-		public IDependencyRegister AddTransient<TService, TImplementation>() where TImplementation : class, TService where TService : class
+		public IDependencyRegister Register(Type type, Type implementationType, Lifetime lifetime)
 		{
-			Collection.AddTransient<TService, TImplementation>();
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+			if (implementationType == null)
+				throw new ArgumentNullException(nameof(implementationType));
+
+			switch (lifetime)
+			{
+				case Lifetime.Transient:
+					{
+						_collection.AddTransient(type, implementationType);
+						break;
+					}
+				case Lifetime.Singelton:
+					{
+						_collection.AddSingleton(type, implementationType);
+						break;
+					}
+				default:
+					throw new NotSupportedException($"Lifetime '{lifetime}' is not supported");
+			}
+
 			return this;
 		}
 
-		public IDependencyRegister AddTransient<TService>(Func<IDependencyResolver, TService> instanceCreator) where TService : class
+		public IDependencyRegister Register<T>(Type type, Func<IDependencyResolver, T> instanceCreator, Lifetime lifetime) where T : class
 		{
-			Collection.AddTransient(c => instanceCreator(new ServiceProviderAdapter(c)));
+			if (instanceCreator == null)
+				throw new ArgumentNullException(nameof(instanceCreator));
+
+			switch (lifetime)
+			{
+				case Lifetime.Transient:
+					{
+						_collection.Add(new ServiceDescriptor(type, c => instanceCreator(new ServiceProviderAdapter(c)), ServiceLifetime.Transient));
+						break;
+					}
+				case Lifetime.Singelton:
+					{
+						_collection.Add(new ServiceDescriptor(type, c => instanceCreator(new ServiceProviderAdapter(c)), ServiceLifetime.Singleton));
+						break;
+					}
+				default:
+					throw new NotSupportedException($"Lifetime '{lifetime}' is not supported");
+			}
+
 			return this;
 		}
 
-		public IDependencyRegister AddTransient<TService, TImplementation>(Func<IDependencyResolver, TImplementation> instanceCreator) where TService : class where TImplementation : class, TService
+		public bool IsRegistered(Type type)
 		{
-			Collection.AddTransient<TService, TImplementation>(c => instanceCreator(new ServiceProviderAdapter(c)));
-			return this;
-		}
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
 
-		public IDependencyRegister AddSingleton<TService>(TService instance) where TService : class
-		{
-			Collection.AddSingleton(instance);
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton<TService, TImplementation>(Func<IDependencyResolver, TService> instanceCreator) where TImplementation : class, TService where TService : class
-		{
-			Collection.AddSingleton(c => instanceCreator(new ServiceProviderAdapter(c)));
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton<TService>(Func<IDependencyResolver, TService> instanceCreator) where TService : class
-		{
-			Collection.AddSingleton<TService>(c => instanceCreator(new ServiceProviderAdapter(c)));
-			return this;
-		}
-
-		public IDependencyRegister AddSingleton<TService, TImplementation>() where TImplementation : class, TService where TService : class
-		{
-			Collection.AddSingleton<TService, TImplementation>();
-			return this;
+			return _collection.Any(d => d.ServiceType == type);
 		}
 	}
 }

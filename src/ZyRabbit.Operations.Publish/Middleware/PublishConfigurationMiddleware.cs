@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Configuration.Publisher;
-using ZyRabbit.Logging;
 using ZyRabbit.Pipe;
 
 namespace ZyRabbit.Operations.Publish.Middleware
@@ -20,14 +20,15 @@ namespace ZyRabbit.Operations.Publish.Middleware
 		protected readonly Func<IPipeContext, string> ExchangeFunc;
 		protected readonly Func<IPipeContext, string> RoutingKeyFunc;
 		protected readonly Func<IPipeContext, Type> MessageTypeFunc;
-		private readonly ILog _logger = LogProvider.For<PublishConfigurationMiddleware>();
+		protected readonly ILogger<PublishConfigurationMiddleware> Logger;
 
-		public PublishConfigurationMiddleware(IPublisherConfigurationFactory publisherFactory, PublishConfigurationOptions options = null)
+		public PublishConfigurationMiddleware(IPublisherConfigurationFactory publisherFactory, ILogger<PublishConfigurationMiddleware> logger, PublishConfigurationOptions options = null)
 		{
-			PublisherFactory = publisherFactory;
+			PublisherFactory = publisherFactory ?? throw new ArgumentNullException(nameof(publisherFactory));
 			ExchangeFunc = options?.ExchangeFunc ?? (context => context.GetPublishConfiguration()?.Exchange.Name);
 			RoutingKeyFunc = options?.RoutingKeyFunc ?? (context => context.GetPublishConfiguration()?.RoutingKey);
 			MessageTypeFunc = options?.MessageTypeFunc ?? (context => context.GetMessageType());
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public override Task InvokeAsync(IPipeContext context, CancellationToken token)
@@ -35,14 +36,14 @@ namespace ZyRabbit.Operations.Publish.Middleware
 			var config = ExtractConfigFromMessageType(context) ?? ExtractConfigFromStrings(context);
 			if (config == null)
 			{
-				_logger.Warn("Unable to find PublisherConfiguration from message type or parameters.");
+				Logger.LogWarning("Unable to find PublisherConfiguration from message type or parameters.");
 				throw new ArgumentNullException(nameof(config));
 			}
 
 			var action = context.Get<Action<IPublisherConfigurationBuilder>>(PipeKey.ConfigurationAction);
 			if (action != null)
 			{
-				_logger.Debug($"Custom configuration supplied. Applying.");
+				Logger.LogDebug($"Custom configuration supplied. Applying.");
 				var builder = new PublisherConfigurationBuilder(config);
 				action(builder);
 				config = builder.Config;

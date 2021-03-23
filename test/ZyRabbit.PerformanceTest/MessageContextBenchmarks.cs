@@ -9,14 +9,13 @@ namespace ZyRabbit.PerformanceTest
 	public class MessageContextBenchmarks
 	{
 		private IBusClient _withoutContext;
-		private Task _completedTask;
-		private MessageA _messageA;
+		private Action<MessageA> _subscribeWithoutContext;
+		private MessageA _messageA = new MessageA();
 		private IBusClient _withContext;
-		private MessageB _messageB;
-		public event EventHandler MessageReceived;
-		public delegate void MessageReceivedEventHandler(EventHandler e);
+		private Action<MessageB> _subscribeWithContext;
+		private MessageB _messageB = new MessageB();
 
-		[Setup]
+		[GlobalSetup]
 		public void Setup()
 		{
 			_withoutContext = ZyRabbitFactory.CreateSingleton();
@@ -24,26 +23,23 @@ namespace ZyRabbit.PerformanceTest
 			{
 				Plugins = p => p.UseMessageContext<MessageContext>()
 			});
-			_completedTask = Task.FromResult(0);
-			_messageA = new MessageA();
-			_messageB = new MessageB();
 			_withoutContext.SubscribeAsync<MessageA>(message =>
 			{
-				MessageReceived(message, EventArgs.Empty);
-				return _completedTask;
+				_subscribeWithoutContext(message);
+				return Task.CompletedTask;
 			});
 			_withContext.SubscribeAsync<MessageB, MessageContext>((message, context) =>
 			{
-				MessageReceived(message, EventArgs.Empty);
-				return _completedTask;
+				_subscribeWithContext(message);
+				return Task.CompletedTask;
 			});
 		}
 
-		[Cleanup]
+		[GlobalCleanup]
 		public void Cleanup()
 		{
 			_withoutContext.DeleteQueueAsync<MessageA>();
-			_withoutContext.DeleteQueueAsync<MessageB>();
+			_withContext.DeleteQueueAsync<MessageB>();
 			(_withoutContext as IDisposable).Dispose();
 			(_withContext as IDisposable).Dispose();
 		}
@@ -51,29 +47,26 @@ namespace ZyRabbit.PerformanceTest
 		[Benchmark]
 		public async Task MessageContext_FromFactory()
 		{
-			var msgTsc = new TaskCompletionSource<Message>();
+			var msgTsc = new TaskCompletionSource<MessageB>();
+			_subscribeWithContext = message => msgTsc.SetResult(message);
 
-			EventHandler onMessageReceived = (sender, args) => { msgTsc.TrySetResult(sender as Message); };
-			MessageReceived += onMessageReceived;
-
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			_withContext.PublishAsync(_messageB);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			await msgTsc.Task;
-			MessageReceived -= onMessageReceived;
 		}
 
 		[Benchmark]
 		public async Task MessageContext_None()
 		{
-			var msgTsc = new TaskCompletionSource<Message>();
+			var msgTsc = new TaskCompletionSource<MessageA>();
+			_subscribeWithoutContext = message => msgTsc.SetResult(message);
 
-			EventHandler onMessageReceived = (sender, args) => { msgTsc.TrySetResult(sender as Message); };
-			MessageReceived += onMessageReceived;
-
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			_withoutContext.PublishAsync(_messageA);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 			await msgTsc.Task;
-			MessageReceived -= onMessageReceived;
 		}
-
 
 		public class MessageA { }
 		public class MessageB { }

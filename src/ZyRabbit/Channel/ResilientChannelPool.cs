@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using ZyRabbit.Channel.Abstraction;
 
@@ -12,16 +14,16 @@ namespace ZyRabbit.Channel
 		protected readonly IChannelFactory ChannelFactory;
 		private readonly int _desiredChannelCount;
 
-		public ResilientChannelPool(IChannelFactory factory, int channelCount)
-			: this(factory, CreateSeed(factory, channelCount)) { }
+		public ResilientChannelPool(IChannelFactory factory, ILogger<IChannelPool> logger, int channelCount)
+			: this(factory, logger, CreateSeed(factory, channelCount)) { }
 
-		public ResilientChannelPool(IChannelFactory factory)
-			: this(factory, Enumerable.Empty<IModel>()) { }
+		public ResilientChannelPool(IChannelFactory factory, ILogger<IChannelPool> logger)
+			: this(factory, logger, Enumerable.Empty<IModel>()) { }
 
-		public ResilientChannelPool(IChannelFactory factory, IEnumerable<IModel> seed) : base(seed)
+		public ResilientChannelPool(IChannelFactory factory, ILogger<IChannelPool> logger, IEnumerable<IModel> seed) : base(seed, logger)
 		{
-			ChannelFactory = factory;
-			_desiredChannelCount = seed.Count();
+			ChannelFactory = factory ?? throw new ArgumentNullException(nameof(factory));
+			_desiredChannelCount = (seed ?? throw new ArgumentNullException(nameof(seed))).Count();
 		}
 
 		private static IEnumerable<IModel> CreateSeed(IChannelFactory factory, int channelCount)

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
@@ -14,14 +14,15 @@ namespace ZyRabbit.Pipe.Middleware
 
 	public class ExceptionHandlingMiddleware : Middleware
 	{
-		protected Func<Exception, IPipeContext, CancellationToken, Task> HandlingFunc;
+		protected readonly Func<Exception, IPipeContext, CancellationToken, Task> HandlingFunc;
 		public Middleware InnerPipe;
-		private readonly ILog _logger = LogProvider.For<ExceptionHandlingMiddleware>();
+		protected readonly ILogger<ExceptionHandlingMiddleware> Logger;
 
-		public ExceptionHandlingMiddleware(IPipeBuilderFactory factory, ExceptionHandlingOptions options = null)
+		public ExceptionHandlingMiddleware(IPipeBuilderFactory factory, ILogger<ExceptionHandlingMiddleware> logger, ExceptionHandlingOptions options = null)
 		{
-			HandlingFunc = options?.HandlingFunc ?? ((exception, context, token) => Task.FromResult(0));
-			InnerPipe = factory.Create(options?.InnerPipe);
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			HandlingFunc = options?.HandlingFunc ?? ((exception, context, token) => Task.CompletedTask);
+			InnerPipe = (factory ?? throw new ArgumentNullException(nameof(factory))).Create(options?.InnerPipe);
 		}
 
 		public override async Task InvokeAsync(IPipeContext context, CancellationToken token)
@@ -33,7 +34,7 @@ namespace ZyRabbit.Pipe.Middleware
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e, "Exception thrown. Will be handled by Exception Handler");
+				Logger.LogError(e, "Exception thrown. Will be handled by Exception Handler");
 				await OnExceptionAsync(e, context, token);
 			}
 		}

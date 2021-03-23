@@ -4,13 +4,14 @@ using ZyRabbit.Common;
 using ZyRabbit.Pipe;
 using ZyRabbit.Pipe.Middleware;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace ZyRabbit.Enrichers.Polly.Middleware
 {
 	public class BasicPublishMiddleware : Pipe.Middleware.BasicPublishMiddleware
 	{
-		public BasicPublishMiddleware(IExclusiveLock exclusive, BasicPublishOptions options = null)
-			: base(exclusive, options) { }
+		public BasicPublishMiddleware(IExclusiveLock exclusive, ILogger<Pipe.Middleware.BasicPublishMiddleware> logger, BasicPublishOptions options = null)
+			: base(exclusive, logger, options) { }
 
 		protected override void BasicPublish(
 				IModel channel,

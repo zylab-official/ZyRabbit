@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ZyRabbit.DependencyInjection.ServiceCollection
@@ -9,25 +12,67 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 
 		public ServiceProviderAdapter(IServiceProvider provider)
 		{
-			_provider = provider;
-		}
-
-		public ServiceProviderAdapter(IServiceCollection collection)
-		{
-			collection.AddSingleton<IDependencyResolver, ServiceProviderAdapter>(provider => this);
-			_provider = collection.BuildServiceProvider();
-		}
-
-		public TService GetService<TService>(params object[] additional)
-		{
-			return (TService)GetService(typeof(TService), additional);
+			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
 		}
 
 		public object GetService(Type serviceType, params object[] additional)
 		{
-			additional = additional ?? new object[0];
-			var service = _provider.GetService(serviceType);
-			return service ?? ActivatorUtilities.CreateInstance(_provider, serviceType, additional);
+			if (serviceType == null)
+				throw new ArgumentNullException(nameof(serviceType));
+
+			additional = additional ?? Array.Empty<object>();
+			if (additional.Length > 0)
+			{
+				var additionalTypes = additional.Select(a => a.GetType()).ToArray();
+				var additionalParams = new LinkedList<object>(additional);
+
+				// TODO: find a better way to search for the matching constructor
+				var ctor = serviceType.GetConstructors().FirstOrDefault();
+				if (ctor == null)
+				{
+					throw new Exception($"Unable to find suitable constructor for {serviceType.Name}.");
+				}
+
+				var parameters = ctor.GetParameters().Select((p, i) =>
+				{
+					if (additionalTypes.Contains(p.ParameterType))
+					{
+						for (var parameter = additionalParams.First; parameter != null;)
+						{
+							var next = parameter.Next;
+							if (parameter.Value.GetType() == p.ParameterType)
+							{
+								additionalParams.Remove(parameter.Value);
+								return parameter.Value;
+							}
+
+							parameter = next;
+						}
+
+						if (p.Attributes.HasFlag(ParameterAttributes.Optional))
+						{
+							return p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null;
+						}
+						else
+						{
+							throw new Exception($"Cannot resolve parameter of type {p.ParameterType} in constructor {ctor} for type '{serviceType.Name}'.");
+						}
+					}
+					else
+					{
+						if (p.Attributes.HasFlag(ParameterAttributes.Optional))
+						{
+							return _provider.GetService(p.ParameterType);
+						}
+
+						return _provider.GetRequiredService(p.ParameterType);
+					}
+				}).ToArray();
+
+				return ctor.Invoke(parameters);
+			}
+
+			return _provider.GetService(serviceType) ?? ActivatorUtilities.CreateInstance(_provider, serviceType);
 		}
 	}
 }

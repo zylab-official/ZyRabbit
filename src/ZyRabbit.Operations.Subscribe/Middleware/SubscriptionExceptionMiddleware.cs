@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Common;
 using ZyRabbit.Configuration.Exchange;
-using ZyRabbit.Logging;
 using ZyRabbit.Pipe;
 using ZyRabbit.Pipe.Middleware;
 using IModel = RabbitMQ.Client.IModel;
@@ -22,7 +22,6 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 		private readonly IChannelFactory _channelFactory;
 		private readonly ITopologyProvider _provider;
 		private readonly INamingConventions _conventions;
-		private readonly ILog _logger = LogProvider.For<SubscriptionExceptionMiddleware>();
 		protected Func<IPipeContext, IChannelFactory, Task<IModel>> ChannelFunc;
 
 		public SubscriptionExceptionMiddleware(
@@ -30,18 +29,19 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 			IChannelFactory channelFactory,
 			ITopologyProvider provider,
 			INamingConventions conventions,
+			ILogger<ExceptionHandlingMiddleware> logger,
 			SubscriptionExceptionOptions options)
-			: base(factory, new ExceptionHandlingOptions {InnerPipe = options.InnerPipe})
+			: base(factory, logger, new ExceptionHandlingOptions {InnerPipe = options.InnerPipe})
 		{
-			_channelFactory = channelFactory;
-			_provider = provider;
-			_conventions = conventions;
+			_channelFactory = channelFactory ?? throw new ArgumentNullException(nameof(channelFactory));
+			_provider = provider ?? throw new ArgumentNullException(nameof(provider));
+			_conventions = conventions ?? throw new ArgumentNullException(nameof(conventions));
 			ChannelFunc = options?.ChannelFunc ?? ((c, f) =>f.CreateChannelAsync());
 		}
 
 		protected override async Task OnExceptionAsync(Exception exception, IPipeContext context, CancellationToken token)
 		{
-			_logger.Info(exception, "Unhandled exception thrown when consuming message");
+			Logger.LogInformation(exception, "Unhandled exception thrown when consuming message");
 			try
 			{
 				var exchangeCfg = GetExchangeDeclaration(context);
@@ -52,7 +52,7 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e, "Unable to publish message to Error Exchange");
+				Logger.LogError(e, "Unable to publish message to Error Exchange");
 			}
 			try
 			{
@@ -60,7 +60,7 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e, "Unable to ack message.");
+				Logger.LogError(e, "Unable to ack message.");
 			}
 		}
 
@@ -90,7 +90,7 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 			args.BasicProperties.Headers?.TryAdd(PropertyHeaders.ExceptionType, exception.GetType().Name);
 			args.BasicProperties.Headers?.TryAdd(PropertyHeaders.ExceptionStackTrace, exception.StackTrace);
 			channel.BasicPublish(exchange.Name, args.RoutingKey, false, args.BasicProperties, args.Body);
-			return Task.FromResult(0);
+			return Task.CompletedTask;
 		}
 
 		protected virtual Task AckMessageIfApplicable(IPipeContext context)
@@ -98,27 +98,27 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 			var autoAck = context.GetConsumeConfiguration()?.AutoAck;
 			if (!autoAck.HasValue)
 			{
-				_logger.Debug("Unable to ack original message. Can not determine if AutoAck is configured.");
-				return Task.FromResult(0);
+				Logger.LogDebug("Unable to ack original message. Can not determine if AutoAck is configured.");
+				return Task.CompletedTask;
 			}
 			if (autoAck.Value)
 			{
-				_logger.Debug("Consuming in AutoAck mode. No ack'ing will be performed");
-				return Task.FromResult(0);
+				Logger.LogDebug("Consuming in AutoAck mode. No ack'ing will be performed");
+				return Task.CompletedTask;
 			}
 			var deliveryTag = context.GetDeliveryEventArgs()?.DeliveryTag;
 			if (deliveryTag == null)
 			{
-				_logger.Info("Unable to ack original message. Delivery tag not found.");
-				return Task.FromResult(0);
+				Logger.LogDebug("Unable to ack original message. Delivery tag not found.");
+				return Task.CompletedTask;
 			}
 			var consumerChannel = context.GetConsumer()?.Model;
 			if (consumerChannel != null && consumerChannel.IsOpen && deliveryTag.HasValue)
 			{
-				_logger.Debug("Acking message with {deliveryTag} on channel {channelNumber}", deliveryTag, consumerChannel.ChannelNumber);
+				Logger.LogDebug("Acking message with {deliveryTag} on channel {channelNumber}", deliveryTag, consumerChannel.ChannelNumber);
 				consumerChannel.BasicAck(deliveryTag.Value, false);
 			}
-			return Task.FromResult(0);
+			return Task.CompletedTask;
 		}
 	}
 }

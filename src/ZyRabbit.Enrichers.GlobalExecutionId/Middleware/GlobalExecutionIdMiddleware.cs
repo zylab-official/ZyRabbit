@@ -1,13 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ZyRabbit.Logging;
 using ZyRabbit.Pipe;
 using ZyRabbit.Pipe.Middleware;
-
-#if NET451
-using System.Runtime.Remoting.Messaging;
-#endif
 
 namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 {
@@ -23,17 +19,14 @@ namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 		protected Func<IPipeContext, string> IdFunc;
 		protected Action<IPipeContext, string> PersistAction;
 
-#if NETSTANDARD2_0
 		protected static readonly AsyncLocal<string> ExecutionId = new AsyncLocal<string>();
-#elif NET451
-		protected const string GlobalExecutionId = "ZyRabbit:GlobalExecutionId";
-#endif
-		private readonly ILog _logger = LogProvider.For<GlobalExecutionIdMiddleware>();
+		private readonly ILogger<GlobalExecutionIdMiddleware> Logger;
 
-		public GlobalExecutionIdMiddleware(GlobalExecutionOptions options = null)
+		public GlobalExecutionIdMiddleware(ILogger<GlobalExecutionIdMiddleware> logger, GlobalExecutionOptions options = null)
 		{
 			IdFunc = options?.IdFunc ?? (context => context.GetGlobalExecutionId());
 			PersistAction = options?.PersistAction ?? ((context, id) => context.Properties.TryAdd(PipeKey.GlobalExecutionId, id));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public override Task InvokeAsync(IPipeContext context, CancellationToken token)
@@ -41,18 +34,18 @@ namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 			var fromContext = GetExecutionIdFromContext(context);
 			if (!string.IsNullOrWhiteSpace(fromContext))
 			{
-				_logger.Info("GlobalExecutionId {globalExecutionId} was allready found in PipeContext.", fromContext);
+				Logger.LogInformation("GlobalExecutionId {globalExecutionId} was allready found in PipeContext.", fromContext);
 				return Next.InvokeAsync(context, token);
 			}
 			var fromProcess = GetExecutionIdFromProcess();
 			if (!string.IsNullOrWhiteSpace(fromProcess))
 			{
-				_logger.Info("Using GlobalExecutionId {globalExecutionId} that was found in the execution process.", fromProcess);
+				Logger.LogInformation("Using GlobalExecutionId {globalExecutionId} that was found in the execution process.", fromProcess);
 				PersistAction(context, fromProcess);
 				return Next.InvokeAsync(context, token);
 			}
 			var created = CreateExecutionId(context);
-			_logger.Info("Creating new GlobalExecutionId {globalExecutionId} for this execution.", created);
+			Logger.LogInformation("Creating new GlobalExecutionId {globalExecutionId} for this execution.", created);
 			PersistAction(context, created);
 			return Next.InvokeAsync(context, token);
 		}
@@ -66,12 +59,7 @@ namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 
 		protected virtual string GetExecutionIdFromProcess()
 		{
-			string executionId = null;
-#if NETSTANDARD2_0
-			executionId = ExecutionId?.Value;
-#elif NET451
-			executionId = CallContext.LogicalGetData(GlobalExecutionId) as string;
-#endif
+			string executionId = ExecutionId?.Value;
 			return executionId;
 		}
 
@@ -87,11 +75,7 @@ namespace ZyRabbit.Enrichers.GlobalExecutionId.Middleware
 
 		protected virtual void SaveIdInProcess(string executionId)
 		{
-#if NETSTANDARD2_0
 			ExecutionId.Value = executionId;
-#elif NET451
-			CallContext.LogicalSetData(GlobalExecutionId, executionId);
-#endif
 		}
 	}
 }

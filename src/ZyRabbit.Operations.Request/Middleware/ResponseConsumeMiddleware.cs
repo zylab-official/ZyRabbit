@@ -2,11 +2,11 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ZyRabbit.Configuration.Consumer;
 using ZyRabbit.Consumer;
-using ZyRabbit.Logging;
 using ZyRabbit.Operations.Request.Context;
 using ZyRabbit.Operations.Request.Core;
 using ZyRabbit.Pipe;
@@ -28,17 +28,18 @@ namespace ZyRabbit.Operations.Request.Middleware
 
 		protected readonly IConsumerFactory ConsumerFactory;
 		protected readonly Pipe.Middleware.Middleware ResponsePipe;
-		private readonly ILog _logger = LogProvider.For<ResponseConsumeMiddleware>();
-		protected Func<IPipeContext, ConsumerConfiguration> ResponseConfigFunc;
-		protected Func<IPipeContext, string> CorrelationidFunc;
-		protected Func<IPipeContext, bool> DedicatedConsumerFunc;
+		protected readonly ILogger<ResponseConsumeMiddleware> Logger;
+		protected readonly Func<IPipeContext, ConsumerConfiguration> ResponseConfigFunc;
+		protected readonly Func<IPipeContext, string> CorrelationidFunc;
+		protected readonly Func<IPipeContext, bool> DedicatedConsumerFunc;
 
-		public ResponseConsumeMiddleware(IConsumerFactory consumerFactory, IPipeBuilderFactory factory, ResponseConsumerOptions options)
+		public ResponseConsumeMiddleware(IConsumerFactory consumerFactory, IPipeBuilderFactory factory, ILogger<ResponseConsumeMiddleware> logger, ResponseConsumerOptions options)
 		{
 			ResponseConfigFunc = options?.ResponseConfigFunc ?? (context => context.GetResponseConfiguration());
 			CorrelationidFunc = options?.CorrelationIdFunc ?? (context => context.GetBasicProperties()?.CorrelationId);
 			DedicatedConsumerFunc = options?.UseDedicatedConsumer ?? (context => context.GetDedicatedResponseConsumer());
-			ConsumerFactory = consumerFactory;
+			ConsumerFactory = consumerFactory ?? throw new ArgumentNullException(nameof(consumerFactory));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			ResponsePipe = factory.Create(options.ResponseReceived);
 		}
 
@@ -77,10 +78,10 @@ namespace ZyRabbit.Operations.Request.Middleware
 			await Next.InvokeAsync(context, token);
 			token.Register(() => responseTsc.TrySetCanceled());
 			await responseTsc.Task;
-			_logger.Info("Message '{messageId}' for correlation id '{correlationId}' received.", responseTsc.Task.Result.BasicProperties.MessageId, correlationId);
+			Logger.LogInformation("Message '{messageId}' for correlation id '{correlationId}' received.", responseTsc.Task.Result.BasicProperties.MessageId, correlationId);
 			if (dedicatedConsumer)
 			{
-				_logger.Info("Disposing dedicated consumer on queue {queueName}", respondCfg.Consume.QueueName);
+				Logger.LogInformation("Disposing dedicated consumer on queue {queueName}", respondCfg.Consume.QueueName);
 				consumer.Model.Dispose();
 				AllResponses.TryRemove(consumer, out _);
 			}
@@ -91,7 +92,7 @@ namespace ZyRabbit.Operations.Request.Middleware
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e, "Response pipe for message '{messageId}' executed unsuccessfully.", responseTsc.Task.Result.BasicProperties.MessageId);
+				Logger.LogError(e, "Response pipe for message '{messageId}' executed unsuccessfully.", responseTsc.Task.Result.BasicProperties.MessageId);
 				throw;
 			}
 		}

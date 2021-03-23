@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Polly;
 using RabbitMQ.Client;
 using ZyRabbit.Configuration;
@@ -10,12 +10,12 @@ namespace ZyRabbit.Enrichers.Polly.Services
 {
 	public class ChannelFactory : Channel.ChannelFactory
 	{
-		protected Policy CreateChannelPolicy;
-		protected Policy ConnectPolicy;
-		protected Policy GetConnectionPolicy;
+		protected readonly Policy CreateChannelPolicy;
+		protected readonly Policy ConnectPolicy;
+		protected readonly Policy GetConnectionPolicy;
 
-		public ChannelFactory(IConnectionFactory connectionFactory, ZyRabbitConfiguration config, ConnectionPolicies policies = null)
-			: base(connectionFactory, config)
+		public ChannelFactory(IConnectionFactory connectionFactory, ZyRabbitConfiguration config, ILogger<Channel.ChannelFactory> logger, ConnectionPolicies policies = null)
+			: base(connectionFactory, config, logger)
 		{
 			CreateChannelPolicy = policies?.CreateChannel ?? Policy.NoOpAsync();
 			ConnectPolicy = policies?.Connect ?? Policy.NoOpAsync();

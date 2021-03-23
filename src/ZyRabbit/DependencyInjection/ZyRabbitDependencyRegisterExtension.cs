@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
+using System.Linq;
 using ZyRabbit.Channel;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Common;
@@ -63,7 +65,10 @@ namespace ZyRabbit.DependencyInjection
 				.AddSingleton<IConsumerFactory, ConsumerFactory>()
 				.AddSingleton<IChannelFactory>(resolver =>
 				{
-					var channelFactory = new ChannelFactory(resolver.GetService<IConnectionFactory>(), resolver.GetService<ZyRabbitConfiguration>());
+					var channelFactory = new ChannelFactory(
+						resolver.GetService<IConnectionFactory>(),
+						resolver.GetService<ZyRabbitConfiguration>(),
+						resolver.GetService<ILogger<ChannelFactory>>());
 					channelFactory
 						.ConnectAsync()
 						.ConfigureAwait(false)
@@ -92,8 +97,23 @@ namespace ZyRabbit.DependencyInjection
 			options?.Plugins?.Invoke(clientBuilder);
 			clientBuilder.DependencyInjection?.Invoke(register);
 			register.AddSingleton(clientBuilder.PipeBuilderAction);
-
 			options?.DependencyInjection?.Invoke(register);
+
+			if (!register.IsRegistered(typeof(ILogger<>)))
+			{
+				register.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+			}
+
+			if (!register.IsRegistered(typeof(ILogger)))
+			{
+				register.AddSingleton<ILogger, NullLogger>(resolver => NullLogger.Instance);
+			}
+
+			if (!register.IsRegistered(typeof(ILoggerFactory)))
+			{
+				register.AddSingleton<ILoggerFactory, NullLoggerFactory>();
+			}
+
 			return register;
 		}
 	}

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Common;
@@ -10,8 +11,8 @@ namespace ZyRabbit.Enrichers.Polly.Middleware
 {
 	public class QueueDeclareMiddleware : Pipe.Middleware.QueueDeclareMiddleware
 	{
-		public QueueDeclareMiddleware(ITopologyProvider topology, QueueDeclareOptions options = null)
-				: base(topology, options)
+		public QueueDeclareMiddleware(ITopologyProvider topology, ILogger<Pipe.Middleware.QueueDeclareMiddleware> logger, QueueDeclareOptions options = null)
+				: base(topology, logger, options)
 		{
 		}
 

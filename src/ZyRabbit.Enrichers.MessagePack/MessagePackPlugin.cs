@@ -1,4 +1,5 @@
-﻿using ZyRabbit.Instantiation;
+﻿using ZyRabbit.DependencyInjection;
+using ZyRabbit.Instantiation;
 using ZyRabbit.Serialization;
 
 namespace ZyRabbit.Enrichers.MessagePack

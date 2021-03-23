@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Autofac.Features.ResolveAnything;
-using ZyRabbit.DependencyInjection;
+using System;
 using ZyRabbit.Instantiation;
 
 namespace ZyRabbit.DependencyInjection.Autofac
@@ -11,9 +11,13 @@ namespace ZyRabbit.DependencyInjection.Autofac
 
 		public static ContainerBuilder RegisterZyRabbit(this ContainerBuilder builder, ZyRabbitOptions options = null)
 		{
-			builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource(type => type.Namespace.StartsWith(ZyRabbit)));
+			if (builder == null)
+				throw new ArgumentNullException(nameof(builder));
+
 			var adapter = new ContainerBuilderAdapter(builder);
 			adapter.AddZyRabbit(options);
+			builder.RegisterSource(new AnyConcreteTypeNotAlreadyRegisteredSource(type => type.Namespace.StartsWith(ZyRabbit)));
+
 			return builder;
 		}
 	}

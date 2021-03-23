@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ZyRabbit.Consumer;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
@@ -18,17 +18,21 @@ namespace ZyRabbit.Pipe.Middleware
 
 	public class ConsumerMessageHandlerMiddleware : Middleware
 	{
-		protected IPipeContextFactory ContextFactory;
-		protected Middleware ConsumePipe;
-		protected Func<IPipeContext, IBasicConsumer> ConsumeFunc;
-		protected Func<IPipeContext, SemaphoreSlim> SemaphoreFunc;
-		protected Func<IPipeContext, Action<Func<Task>, CancellationToken>> ThrottledExecutionFunc;
-		private readonly ILog _logger = LogProvider.For<ConsumerMessageHandlerMiddleware>();
+		protected readonly IPipeContextFactory ContextFactory;
+		protected readonly Middleware ConsumePipe;
+		protected readonly Func<IPipeContext, IBasicConsumer> ConsumeFunc;
+		protected readonly Func<IPipeContext, Action<Func<Task>, CancellationToken>> ThrottledExecutionFunc;
+		protected readonly ILogger<ConsumerMessageHandlerMiddleware> Logger;
 
-		public ConsumerMessageHandlerMiddleware(IPipeBuilderFactory pipeBuilderFactory, IPipeContextFactory contextFactory, ConsumeOptions options = null)
+		public ConsumerMessageHandlerMiddleware(
+			IPipeBuilderFactory pipeBuilderFactory,
+			IPipeContextFactory contextFactory,
+			ILogger<ConsumerMessageHandlerMiddleware> logger,
+			ConsumeOptions options = null)
 		{
-			ContextFactory = contextFactory;
-			ConsumeFunc = options?.ConsumerFunc ?? (context =>context.GetConsumer());
+			ContextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			ConsumeFunc = options?.ConsumerFunc ?? (context => context.GetConsumer());
 			ConsumePipe = pipeBuilderFactory.Create(options?.Pipe ?? (builder => {}));
 			ThrottledExecutionFunc = options?.ThrottleFuncFunc ?? (context => context.GetConsumeThrottleAction());
 		}
@@ -52,7 +56,7 @@ namespace ZyRabbit.Pipe.Middleware
 
 		protected virtual async Task InvokeConsumePipeAsync(IPipeContext context, BasicDeliverEventArgs args, CancellationToken token)
 		{
-			_logger.Debug("Invoking consumer pipe for message {messageId}", args?.BasicProperties?.MessageId);
+			Logger.LogDebug("Invoking consumer pipe for message {messageId}", args?.BasicProperties?.MessageId);
 			var consumeContext = ContextFactory.CreateContext(context.Properties.ToArray());
 			consumeContext.Properties.Add(PipeKey.DeliveryEventArgs, args);
 			try
@@ -61,7 +65,7 @@ namespace ZyRabbit.Pipe.Middleware
 			}
 			catch (Exception e)
 			{
-				_logger.Error(e, "An unhandled exception was thrown when consuming message with routing key {routingKey}", args.RoutingKey);
+				Logger.LogError(e, "An unhandled exception was thrown when consuming message with routing key {routingKey}", args.RoutingKey);
 				throw;
 			}
 		}

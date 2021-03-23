@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Configuration.Consumer;
-using ZyRabbit.Logging;
 using ZyRabbit.Pipe;
 
 namespace ZyRabbit.Operations.Subscribe.Middleware
@@ -16,16 +16,16 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 
 	public class SubscriptionConfigurationMiddleware : Pipe.Middleware.Middleware
 	{
-		private readonly ILog _logger = LogProvider.For<SubscriptionConfigurationMiddleware>();
-
+		protected readonly ILogger<SubscriptionConfigurationMiddleware> Logger;
 		protected readonly IConsumerConfigurationFactory ConfigFactory;
 		protected Func<IPipeContext, Type> MessageTypeFunc;
 		protected Func<IPipeContext, ConsumerConfiguration> ConfigurationFunc;
 		protected Func<IPipeContext, Action<IConsumerConfigurationBuilder>> ConfigActionFunc;
 
-		public SubscriptionConfigurationMiddleware(IConsumerConfigurationFactory configFactory, SubscriptionConfigurationOptions options = null)
+		public SubscriptionConfigurationMiddleware(IConsumerConfigurationFactory configFactory, ILogger<SubscriptionConfigurationMiddleware> logger, SubscriptionConfigurationOptions options = null)
 		{
-			ConfigFactory = configFactory;
+			ConfigFactory = configFactory ?? throw new ArgumentNullException(nameof(configFactory));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			MessageTypeFunc = options?.MessageTypeFunc ?? (context => context.GetMessageType()) ;
 			ConfigurationFunc = options?.ConfigFunc;
 			ConfigActionFunc = options?.ConfigActionFunc ?? (context => context.Get<Action<IConsumerConfigurationBuilder>>(PipeKey.ConfigurationAction));
@@ -36,13 +36,13 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 			var config = ExtractFromContextProperty(context) ?? ExtractConfigFromMessageType(context);
 			if (config == null)
 			{
-				_logger.Info("Unable to extract configuration for Subscriber.");
+				Logger.LogInformation("Unable to extract configuration for Subscriber.");
 			}
 
 			var action = GetConfigurationAction(context);
 			if (action != null)
 			{
-				_logger.Info("Configuration action for {queueName} found.", config?.Consume.QueueName);
+				Logger.LogInformation("Configuration action for {queueName} found.", config?.Consume.QueueName);
 				var builder = new ConsumerConfigurationBuilder(config);
 				action(builder);
 				config = builder.Config;
@@ -66,7 +66,7 @@ namespace ZyRabbit.Operations.Subscribe.Middleware
 			var messageType = MessageTypeFunc(context);
 			if (messageType != null)
 			{
-				_logger.Debug("Found message type {messageType} in context. Creating consumer config based on it.", messageType.Name);
+				Logger.LogDebug("Found message type {messageType} in context. Creating consumer config based on it.", messageType.Name);
 			}
 			return messageType == null
 				? null

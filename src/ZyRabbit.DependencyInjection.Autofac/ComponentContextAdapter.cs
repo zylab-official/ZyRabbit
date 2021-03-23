@@ -2,8 +2,6 @@
 using System.Linq;
 using Autofac;
 using Autofac.Core;
-using Autofac.Core.Registration;
-using ZyRabbit.DependencyInjection;
 
 namespace ZyRabbit.DependencyInjection.Autofac
 {
@@ -18,12 +16,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 
 		public ComponentContextAdapter(IComponentContext context)
 		{
-			_context = context;
-		}
-
-		public TService GetService<TService>(params object[] additional)
-		{
-			return (TService)GetService(typeof(TService), additional);
+			_context = context ?? throw new ArgumentNullException(nameof(context));
 		}
 
 		public object GetService(Type serviceType, params object[] additional)
@@ -31,7 +24,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 			var parameters = additional
 				.Select(a => new TypedParameter(a.GetType(), a))
 				.ToList<Parameter>();
-			return _context.Resolve(serviceType, parameters);
+			return _context.Resolve(serviceType ?? throw new ArgumentNullException(nameof(serviceType)), parameters);
 		}
 	}
 }

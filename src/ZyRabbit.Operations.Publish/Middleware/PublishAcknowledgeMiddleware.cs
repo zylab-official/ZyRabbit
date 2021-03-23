@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using ZyRabbit.Common;
 using ZyRabbit.Exceptions;
-using ZyRabbit.Logging;
 using ZyRabbit.Operations.Publish.Context;
 using ZyRabbit.Pipe;
 
@@ -23,19 +23,20 @@ namespace ZyRabbit.Operations.Publish.Middleware
 	public class PublishAcknowledgeMiddleware : Pipe.Middleware.Middleware
 	{
 		private readonly IExclusiveLock _exclusive;
-		private readonly ILog _logger = LogProvider.For<PublishAcknowledgeMiddleware>();
+		private readonly ILogger<PublishAcknowledgeMiddleware> _logger;
 		protected Func<IPipeContext, TimeSpan> TimeOutFunc;
 		protected Func<IPipeContext, IModel> ChannelFunc;
 		protected Func<IPipeContext, bool> EnabledFunc;
 
-		protected static Dictionary<IModel, ConcurrentDictionary<ulong, TaskCompletionSource<ulong>>> ConfirmsDictionary =
-			new Dictionary<IModel, ConcurrentDictionary<ulong, TaskCompletionSource<ulong>>>();
+		protected static ConcurrentDictionary<IModel, ConcurrentDictionary<ulong, TaskCompletionSource<ulong>>> ConfirmsDictionary =
+			new ConcurrentDictionary<IModel, ConcurrentDictionary<ulong, TaskCompletionSource<ulong>>>();
 		protected static ConcurrentDictionary<IModel, object> ChannelLocks = new ConcurrentDictionary<IModel, object>();
 		protected static Dictionary<IModel, ulong> ChannelSequences = new Dictionary<IModel, ulong>();
 
-		public PublishAcknowledgeMiddleware(IExclusiveLock exclusive, PublishAcknowledgeOptions options = null)
+		public PublishAcknowledgeMiddleware(IExclusiveLock exclusive, ILogger<PublishAcknowledgeMiddleware> logger, PublishAcknowledgeOptions options = null)
 		{
-			_exclusive = exclusive;
+			_exclusive = exclusive ?? throw new ArgumentNullException(nameof(exclusive));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			TimeOutFunc = options?.TimeOutFunc ?? (context => context.GetPublishAcknowledgeTimeout());
 			ChannelFunc = options?.ChannelFunc ?? (context => context.GetTransientChannel());
 			EnabledFunc = options?.EnabledFunc ?? (context => context.GetPublishAcknowledgeTimeout() != TimeSpan.MaxValue);
@@ -46,7 +47,7 @@ namespace ZyRabbit.Operations.Publish.Middleware
 			var enabled = GetEnabled(context);
 			if (!enabled)
 			{
-				_logger.Debug("Publish Acknowledgement is disabled.");
+				_logger.LogDebug("Publish Acknowledgement is disabled.");
 				await Next.InvokeAsync(context, token);
 				return;
 			}
@@ -66,9 +67,9 @@ namespace ZyRabbit.Operations.Publish.Middleware
 				SetupTimeout(context, sequence, ackTcs);
 				if (!GetChannelDictionary(channel).TryAdd(sequence, ackTcs))
 				{
-					_logger.Info("Unable to add ack '{publishSequence}' on channel {channelNumber}", sequence, channel.ChannelNumber);
+					_logger.LogInformation("Unable to add ack '{publishSequence}' on channel {channelNumber}", sequence, channel.ChannelNumber);
 				}
-				_logger.Info("Sequence {sequence} added to dictionary", sequence);
+				_logger.LogInformation("Sequence {sequence} added to dictionary", sequence);
 
 				return Next.InvokeAsync(context, token);
 			}, token);
@@ -97,16 +98,12 @@ namespace ZyRabbit.Operations.Publish.Middleware
 
 		protected virtual ConcurrentDictionary<ulong, TaskCompletionSource<ulong>> GetChannelDictionary(IModel channel)
 		{
-			if (!ConfirmsDictionary.ContainsKey(channel))
-			{
-				ConfirmsDictionary.Add(channel, new ConcurrentDictionary<ulong, TaskCompletionSource<ulong>>());
-			}
-			return ConfirmsDictionary[channel];
+			return ConfirmsDictionary.GetOrAdd(channel, new ConcurrentDictionary<ulong, TaskCompletionSource<ulong>>());
 		}
 
 		protected virtual void EnableAcknowledgement(IModel channel, CancellationToken token)
 		{
-			_logger.Info("Setting 'Publish Acknowledge' for channel '{channelNumber}'", channel.ChannelNumber);
+			_logger.LogInformation("Setting 'Publish Acknowledge' for channel '{channelNumber}'", channel.ChannelNumber);
 			_exclusive.Execute(channel, c =>
 			{
 				if (PublishAcknowledgeEnabled(c))
@@ -135,10 +132,10 @@ namespace ZyRabbit.Operations.Publish.Middleware
 						}
 						else
 						{
-							_logger.Info("Received ack for {deliveryTag}", args.DeliveryTag);
+							_logger.LogInformation("Received ack for {deliveryTag}", args.DeliveryTag);
 							if (!dictionary.TryRemove(args.DeliveryTag, out var tcs))
 							{
-								_logger.Warn("Unable to find ack tcs for {deliveryTag}", args.DeliveryTag);
+								_logger.LogWarning("Unable to find ack tcs for {deliveryTag}", args.DeliveryTag);
 							}
 							tcs?.TrySetResult(args.DeliveryTag);
 						}
@@ -151,7 +148,7 @@ namespace ZyRabbit.Operations.Publish.Middleware
 		{
 			var timeout = GetAcknowledgeTimeOut(context);
 			Timer ackTimer = null;
-			_logger.Info("Setting up publish acknowledgement for {publishSequence} with timeout {timeout:g}", sequence, timeout);
+			_logger.LogInformation("Setting up publish acknowledgement for {publishSequence} with timeout {timeout:g}", sequence, timeout);
 			ackTimer = new Timer(state =>
 			{
 				ackTcs.TrySetException(new PublishConfirmException($"The broker did not send a publish acknowledgement for message {sequence} within {timeout:g}."));

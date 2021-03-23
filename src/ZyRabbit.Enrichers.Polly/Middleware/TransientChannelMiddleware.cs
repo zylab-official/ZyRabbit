@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Pipe;
@@ -9,8 +10,8 @@ namespace ZyRabbit.Enrichers.Polly.Middleware
 {
 	public class TransientChannelMiddleware : Pipe.Middleware.TransientChannelMiddleware
 	{
-		public TransientChannelMiddleware(IChannelFactory factory)
-			: base(factory) { }
+		public TransientChannelMiddleware(IChannelFactory factory, ILogger<Pipe.Middleware.TransientChannelMiddleware> logger)
+			: base(factory, logger) { }
 
 		protected override Task<IModel> CreateChannelAsync(IPipeContext context, CancellationToken token)
 		{

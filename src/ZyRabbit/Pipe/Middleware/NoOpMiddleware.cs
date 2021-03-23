@@ -7,7 +7,7 @@ namespace ZyRabbit.Pipe.Middleware
 	{
 		public override Task InvokeAsync(IPipeContext context, CancellationToken token)
 		{
-			return Task.FromResult(0);
+			return Task.CompletedTask;
 		}
 	}
 }

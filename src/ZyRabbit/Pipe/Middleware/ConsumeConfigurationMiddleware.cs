@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Configuration.Consume;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
@@ -17,17 +17,18 @@ namespace ZyRabbit.Pipe.Middleware
 
 	public class ConsumeConfigurationMiddleware : Middleware
 	{
-		protected IConsumeConfigurationFactory ConfigFactory;
+		protected readonly IConsumeConfigurationFactory ConfigFactory;
 		protected Func<IPipeContext, string> QueueFunc;
 		protected Func<IPipeContext, string> ExchangeFunc;
 		protected Func<IPipeContext, string> RoutingKeyFunc;
 		protected Func<IPipeContext, Type> MessageTypeFunc;
 		protected Func<IPipeContext, Action<IConsumeConfigurationBuilder>> ConfigActionFunc;
-		private readonly ILog _logger = LogProvider.For<ConsumeConfigurationMiddleware>();
+		protected readonly ILogger<ConsumeConfigurationMiddleware> Logger;
 
-		public ConsumeConfigurationMiddleware(IConsumeConfigurationFactory configFactory, ConsumeConfigurationOptions options = null)
+		public ConsumeConfigurationMiddleware(IConsumeConfigurationFactory configFactory, ILogger<ConsumeConfigurationMiddleware> logger, ConsumeConfigurationOptions options = null)
 		{
-			ConfigFactory = configFactory;
+			ConfigFactory = configFactory ?? throw new ArgumentNullException(nameof(configFactory));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			QueueFunc = options?.QueueFunc ?? (context => context.GetQueueDeclaration()?.Name);
 			ExchangeFunc = options?.ExchangeFunc ?? (context => context.GetExchangeDeclaration()?.Name);
 			RoutingKeyFunc = options?.RoutingKeyFunc ?? (context => context.GetRoutingKey());
@@ -42,7 +43,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var action = GetConfigurationAction(context);
 			if (action != null)
 			{
-				_logger.Info("Configuration action for {queueName} found.", config?.QueueName);
+				Logger.LogInformation("Configuration action for {queueName} found.", config?.QueueName);
 				var builder = new ConsumeConfigurationBuilder(config);
 				action(builder);
 				config = builder.Config;
@@ -68,7 +69,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var routingKey = RoutingKeyFunc(context);
 			var queueName = QueueFunc(context);
 			var exchangeName = ExchangeFunc(context);
-			_logger.Debug("Consuming from queue {queueName} on {exchangeName} with routing key {routingKey}", queueName, exchangeName, routingKey);
+			Logger.LogDebug("Consuming from queue {queueName} on {exchangeName} with routing key {routingKey}", queueName, exchangeName, routingKey);
 			return ConfigFactory.Create(queueName, exchangeName, routingKey);
 		}
 
@@ -77,7 +78,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var messageType = MessageTypeFunc(context);
 			if (messageType != null)
 			{
-				_logger.Debug("Found message type {messageType} in context. Creating consume config based on it.", messageType.Name);
+				Logger.LogDebug("Found message type {messageType} in context. Creating consume config based on it.", messageType.Name);
 			}
 			return messageType == null
 				? null

@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Operations.StateMachine.Core;
 using ZyRabbit.Pipe;
-using ZyRabbit.Pipe.Middleware;
 
 namespace ZyRabbit.Operations.StateMachine.Middleware
 {
@@ -17,15 +16,15 @@ namespace ZyRabbit.Operations.StateMachine.Middleware
 
 	public class RetrieveStateMachineMiddleware : Pipe.Middleware.Middleware
 	{
-		private readonly IStateMachineActivator _stateMachineRepo;
+		private readonly IStateMachineActivator _stateMachineActivator;
 		protected Func<IPipeContext, Guid> ModelIdFunc;
 		protected Func<IPipeContext, Type> StateMachineTypeFunc;
 		protected Action<StateMachineBase, IPipeContext> PostExecuteAction;
 		protected Func<IPipeContext, StateMachineBase> StateMachineFunc;
 
-		public RetrieveStateMachineMiddleware(IStateMachineActivator stateMachineRepo, RetrieveStateMachineOptions options = null)
+		public RetrieveStateMachineMiddleware(IStateMachineActivator stateMachineActivator, RetrieveStateMachineOptions options = null)
 		{
-			_stateMachineRepo = stateMachineRepo;
+			_stateMachineActivator = stateMachineActivator ?? throw new ArgumentNullException(nameof(stateMachineActivator));
 			ModelIdFunc = options?.ModelIdFunc ?? (context => context.Get(StateMachineKey.ModelId, Guid.NewGuid()));
 			StateMachineTypeFunc = options?.StateMachineTypeFunc ?? (context => context.Get<Type>(StateMachineKey.Type));
 			StateMachineFunc = options?.StateMachineFunc;
@@ -47,7 +46,7 @@ namespace ZyRabbit.Operations.StateMachine.Middleware
 			var fromContext = StateMachineFunc?.Invoke(context);
 			return fromContext != null
 				? Task.FromResult(fromContext)
-				: _stateMachineRepo.ActivateAsync(id, type);
+				: _stateMachineActivator.ActivateAsync(id, type);
 		}
 
 		protected virtual Type GetStateMachineType(IPipeContext context)

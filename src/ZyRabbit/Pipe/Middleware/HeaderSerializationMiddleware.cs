@@ -19,15 +19,15 @@ namespace ZyRabbit.Pipe.Middleware
 	public class HeaderSerializationMiddleware : StagedMiddleware
 	{
 		protected readonly ISerializer Serializer;
-		protected Func<IPipeContext, IBasicProperties> BasicPropsFunc;
-		protected Func<IPipeContext, object> RetrieveItemFunc;
-		protected Func<IPipeContext, object> CreateItemFunc;
-		protected Predicate<IPipeContext> ExecutePredicate;
-		protected Func<IPipeContext, string> HeaderKeyFunc;
+		protected readonly Func<IPipeContext, IBasicProperties> BasicPropsFunc;
+		protected readonly Func<IPipeContext, object> RetrieveItemFunc;
+		protected readonly Func<IPipeContext, object> CreateItemFunc;
+		protected readonly Predicate<IPipeContext> ExecutePredicate;
+		protected readonly Func<IPipeContext, string> HeaderKeyFunc;
 
 		public HeaderSerializationMiddleware(ISerializer serializer, HeaderSerializationOptions options = null)
 		{
-			Serializer = serializer;
+			Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
 			ExecutePredicate = options?.ExecutePredicate ?? (context => true);
 			BasicPropsFunc = options?.BasicPropsFunc ?? (context => context.GetBasicProperties());
 			RetrieveItemFunc = options?.RetrieveItemFunc ?? (context => null);
