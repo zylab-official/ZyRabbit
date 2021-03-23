@@ -8,6 +8,7 @@ using RabbitMQ.Client;
 using ZyRabbit.Channel;
 using ZyRabbit.Exceptions;
 using Xunit;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ZyRabbit.Tests.Channel
 {
@@ -25,7 +26,7 @@ namespace ZyRabbit.Tests.Channel
 					.Setup(m => m.IsOpen)
 					.Returns(true);
 			}
-			var pool = new StaticChannelPool(mockObjects.Select(m => m.Object));
+			var pool = new StaticChannelPool(mockObjects.Select(m => m.Object), NullLogger<IChannelPool>.Instance);
 
 			/* Test */
 			var first = await pool.GetAsync();
@@ -55,7 +56,7 @@ namespace ZyRabbit.Tests.Channel
 				.SetupSequence(model => model.IsClosed)
 				.Returns(false)
 				.Returns(true);
-			var pool = new StaticChannelPool(new []{openChannel.Object, toCloseChannel.Object});
+			var pool = new StaticChannelPool(new []{openChannel.Object, toCloseChannel.Object}, NullLogger<IChannelPool>.Instance);
 
 			/* Test */
 			var first = await pool.GetAsync();
@@ -87,7 +88,7 @@ namespace ZyRabbit.Tests.Channel
 				.Returns(true)
 				.Returns(true)
 				.Returns(false);
-			var pool = new StaticChannelPool(new[] { openChannel.Object, closedChannel.Object });
+			var pool = new StaticChannelPool(new[] { openChannel.Object, closedChannel.Object }, NullLogger<IChannelPool>.Instance);
 
 			/* Test */
 			var first = await pool.GetAsync();
@@ -114,7 +115,7 @@ namespace ZyRabbit.Tests.Channel
 					.Setup(m => m.IsClosed)
 					.Returns(true);
 			}
-			var pool = new StaticChannelPool(mockObjects.Select(m => m.Object));
+			var pool = new StaticChannelPool(mockObjects.Select(m => m.Object), NullLogger<IChannelPool>.Instance);
 
 			/* Test */
 			try
@@ -146,7 +147,7 @@ namespace ZyRabbit.Tests.Channel
 				.Returns(true)
 				.Returns(false);
 
-			var pool = new StaticChannelPool(new[] { recoverableChannel.Object, closedChannel.Object });
+			var pool = new StaticChannelPool(new[] { recoverableChannel.Object, closedChannel.Object }, NullLogger<IChannelPool>.Instance);
 
 			/* Test */
 			var channelTask = pool.GetAsync();
@@ -173,7 +174,7 @@ namespace ZyRabbit.Tests.Channel
 					.Setup(m => m.IsClosed)
 					.Returns(false);
 			}
-			var pool = new StaticChannelPool(mockObjects.Select(m => m.Object));
+			var pool = new StaticChannelPool(mockObjects.Select(m => m.Object), NullLogger<IChannelPool>.Instance);
 
 
 			/* Test */
@@ -202,7 +203,7 @@ namespace ZyRabbit.Tests.Channel
 					.Setup(c => c.CloseReason)
 					.Returns(new ShutdownEventArgs(ShutdownInitiator.Application, 0, ""));
 			}
-			var pool = new StaticChannelPool(mockObjects.Select(m => m.Object));
+			var pool = new StaticChannelPool(mockObjects.Select(m => m.Object), NullLogger<IChannelPool>.Instance);
 
 			/* Test */
 			try
@@ -226,7 +227,7 @@ namespace ZyRabbit.Tests.Channel
 			closedChannel
 				.Setup(m => m.IsClosed)
 				.Returns(true);
-			var pool = new StaticChannelPool(new []{closedChannel.Object});
+			var pool = new StaticChannelPool(new []{closedChannel.Object}, NullLogger<IChannelPool>.Instance);
 			var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(50));
 
 			/* Test */
@@ -252,7 +253,7 @@ namespace ZyRabbit.Tests.Channel
 				.SetupSequence(m => m.IsClosed)
 				.Returns(false)
 				.Returns(true);
-			var pool = new StaticChannelPool(new[] { closedChannel.Object });
+			var pool = new StaticChannelPool(new[] { closedChannel.Object }, NullLogger<IChannelPool>.Instance);
 			closedChannel.Raise(c =>c.ModelShutdown += null, null, new ShutdownEventArgs(ShutdownInitiator.Application, 0, string.Empty));
 
 			/* Test */

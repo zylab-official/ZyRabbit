@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
 namespace ZyRabbit.Channel
 {
 	public class DynamicChannelPool : StaticChannelPool
 	{
-		public DynamicChannelPool()
-			: this(Enumerable.Empty<IModel>()) { }
+		public DynamicChannelPool(ILogger<IChannelPool> logger)
+			: this(Enumerable.Empty<IModel>(), logger) { }
 
-		public DynamicChannelPool(IEnumerable<IModel> seed)
-			: base(seed) { }
+		public DynamicChannelPool(IEnumerable<IModel> seed, ILogger<IChannelPool> logger)
+			: base(seed, logger) { }
 
 		public void Add(params IModel[] channels)
 		{

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Common;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
@@ -16,14 +16,15 @@ namespace ZyRabbit.Pipe.Middleware
 	public class QueueBindMiddleware : Middleware
 	{
 		protected readonly ITopologyProvider TopologyProvider;
-		protected Func<IPipeContext, string> QueueNameFunc;
-		protected Func<IPipeContext, string> ExchangeNameFunc;
-		protected Func<IPipeContext, string> RoutingKeyFunc;
-		private readonly ILog _logger = LogProvider.For<QueueBindMiddleware>();
+		protected readonly Func<IPipeContext, string> QueueNameFunc;
+		protected readonly Func<IPipeContext, string> ExchangeNameFunc;
+		protected readonly Func<IPipeContext, string> RoutingKeyFunc;
+		protected readonly ILogger<QueueBindMiddleware> Logger;
 
-		public QueueBindMiddleware(ITopologyProvider topologyProvider, QueueBindOptions options = null)
+		public QueueBindMiddleware(ITopologyProvider topologyProvider, ILogger<QueueBindMiddleware> logger, QueueBindOptions options = null)
 		{
-			TopologyProvider = topologyProvider;
+			TopologyProvider = topologyProvider ?? throw new ArgumentNullException(nameof(topologyProvider));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			QueueNameFunc = options?.QueueNameFunc ?? (context => context.GetConsumeConfiguration()?.QueueName);
 			ExchangeNameFunc = options?.ExchangeNameFunc ?? (context => context.GetConsumeConfiguration()?.ExchangeName);
 			RoutingKeyFunc = options?.RoutingKeyFunc ?? (context => context.GetConsumeConfiguration()?.RoutingKey);
@@ -49,7 +50,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var routingKey = RoutingKeyFunc(context);
 			if (routingKey == null)
 			{
-				_logger.Warn("Routing key not found in Pipe context.");
+				Logger.LogWarning("Routing key not found in Pipe context.");
 			}
 			return routingKey;
 		}
@@ -59,7 +60,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var exchange = ExchangeNameFunc(context);
 			if (exchange == null)
 			{
-				_logger.Warn("Exchange name not found in Pipe context.");
+				Logger.LogWarning("Exchange name not found in Pipe context.");
 			}
 			return exchange;
 		}
@@ -69,7 +70,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var queue = QueueNameFunc(context);
 			if (queue == null)
 			{
-				_logger.Warn("Queue name not found in Pipe context.");
+				Logger.LogWarning("Queue name not found in Pipe context.");
 			}
 			return queue;
 		}

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Common;
 using ZyRabbit.Configuration.Exchange;
 using ZyRabbit.Configuration.Queue;
-using ZyRabbit.Logging;
 using ZyRabbit.Pipe;
 using ZyRabbit.Pipe.Middleware;
 using ExchangeType = RabbitMQ.Client.ExchangeType;
@@ -22,7 +22,7 @@ namespace ZyRabbit.Middleware
 
 	public class RetryLaterMiddleware : StagedMiddleware
 	{
-		private readonly ILog _logger = LogProvider.For<RetryLaterMiddleware>();
+		protected readonly ILogger<RetryLaterMiddleware> Logger;
 		protected readonly ITopologyProvider TopologyProvider;
 		protected readonly INamingConventions Conventions;
 		protected readonly IChannelFactory ChannelFactory;
@@ -32,12 +32,19 @@ namespace ZyRabbit.Middleware
 
 		public override string StageMarker => Pipe.StageMarker.HandlerInvoked;
 
-		public RetryLaterMiddleware(ITopologyProvider topology, INamingConventions conventions, IChannelFactory channelFactory, IRetryInformationHeaderUpdater headerUpdater, RetryLaterOptions options = null)
+		public RetryLaterMiddleware(
+			ITopologyProvider topology,
+			INamingConventions conventions,
+			IChannelFactory channelFactory,
+			IRetryInformationHeaderUpdater headerUpdater,
+			ILogger<RetryLaterMiddleware> logger,
+			RetryLaterOptions options = null)
 		{
-			TopologyProvider = topology;
-			Conventions = conventions;
-			ChannelFactory = channelFactory;
-			_headerUpdater = headerUpdater;
+			TopologyProvider = topology ?? throw new ArgumentNullException(nameof(topology));
+			Conventions = conventions ?? throw new ArgumentNullException(nameof(conventions));
+			ChannelFactory = channelFactory ?? throw new ArgumentNullException(nameof(channelFactory));
+			_headerUpdater = headerUpdater ?? throw new ArgumentNullException(nameof(headerUpdater));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			AcknowledgementFunc = options?.AcknowledgementFunc ?? (context => context.GetMessageAcknowledgement());
 			DeliveryArgsFunc = options?.DeliveryArgsFunc ?? (context => context.GetDeliveryEventArgs());
 		}
@@ -60,7 +67,7 @@ namespace ZyRabbit.Middleware
 			});
 
 			var deliveryArgs = GetDeliveryEventArgs(context);
-			_logger.Info("Message is marked for Retry. Will be published on exchange {exchangeName} with routing key {routingKey} in {retryIn}", deliveryArgs.Exchange, deliveryArgs.RoutingKey, retryAck.Span);
+			Logger.LogInformation("Message is marked for Retry. Will be published on exchange {exchangeName} with routing key {routingKey} in {retryIn}", deliveryArgs.Exchange, deliveryArgs.RoutingKey, retryAck.Span);
 			UpdateRetryHeaders(deliveryArgs, context);
 			var deadLetterQueueName = GetDeadLetterQueueName(deliveryArgs.Exchange, retryAck.Span);
 			var deadLetterExchange = context?.GetConsumerConfiguration()?.Exchange.Name ?? deliveryArgs.Exchange;

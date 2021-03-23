@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Common;
 using ZyRabbit.Configuration.Exchange;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Pipe.Middleware
 {
 	public class ExchangeDeclareOptions
 	{
 		public Func<IPipeContext, ExchangeDeclaration> ExchangeFunc { get; set; }
-		public bool ThrowOnFail { get; set; }
 		public  Func<IPipeContext, bool> ThrowOnFailFunc { get; set; }
 	}
 
@@ -18,12 +17,13 @@ namespace ZyRabbit.Pipe.Middleware
 	{
 		protected readonly ITopologyProvider TopologyProvider;
 		protected readonly Func<IPipeContext, ExchangeDeclaration> ExchangeFunc;
-		protected Func<IPipeContext, bool> ThrowOnFailFunc;
-		private readonly ILog _logger = LogProvider.For<ExchangeDeclareMiddleware>();
+		protected readonly Func<IPipeContext, bool> ThrowOnFailFunc;
+		protected readonly ILogger<ExchangeDeclareMiddleware> Logger;
 
-		public ExchangeDeclareMiddleware(ITopologyProvider topologyProvider, ExchangeDeclareOptions options = null)
+		public ExchangeDeclareMiddleware(ITopologyProvider topologyProvider, ILogger<ExchangeDeclareMiddleware> logger, ExchangeDeclareOptions options = null)
 		{
-			TopologyProvider = topologyProvider;
+			TopologyProvider = topologyProvider ?? throw new ArgumentNullException(nameof(topologyProvider));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			ExchangeFunc = options?.ExchangeFunc ?? (context => context.GetExchangeDeclaration());
 			ThrowOnFailFunc = options?.ThrowOnFailFunc ?? (context => false);
 		}
@@ -34,14 +34,14 @@ namespace ZyRabbit.Pipe.Middleware
 
 			if (exchangeCfg != null)
 			{
-				_logger.Debug($"Exchange configuration found. Declaring '{exchangeCfg.Name}'.");
+				Logger.LogDebug($"Exchange configuration found. Declaring '{exchangeCfg.Name}'.");
 				await DeclareExchangeAsync(exchangeCfg, context, token);
 			}
 			else
 			{
 				if (GetThrowOnFail(context))
 				{
-					throw new ArgumentNullException(nameof(exchangeCfg));
+					throw new InvalidOperationException("Exchange declaration config was not found");
 				}
 			}
 

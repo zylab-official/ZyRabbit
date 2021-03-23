@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using ZyRabbit.Logging;
 using ZyRabbit.Pipe;
 
 namespace ZyRabbit.Operations.Publish.Middleware
@@ -20,13 +20,14 @@ namespace ZyRabbit.Operations.Publish.Middleware
 		protected Func<IPipeContext, EventHandler<BasicReturnEventArgs>> CallbackFunc;
 		protected Func<IPipeContext, IModel> ChannelFunc;
 		protected Action<IPipeContext, EventHandler<BasicReturnEventArgs>> PostInvoke;
-		private readonly ILog _logger = LogProvider.For<ReturnCallbackMiddleware>();
+		protected readonly ILogger<ReturnCallbackMiddleware> Logger;
 
-		public ReturnCallbackMiddleware(ReturnCallbackOptions options = null)
+		public ReturnCallbackMiddleware(ILogger<ReturnCallbackMiddleware> logger, ReturnCallbackOptions options = null)
 		{
 			CallbackFunc = options?.CallbackFunc ?? (context => context.GetReturnCallback());
 			ChannelFunc = options?.ChannelFunc?? (context => context.GetTransientChannel());
 			PostInvoke = options?.PostInvokeAction;
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public override async Task InvokeAsync(IPipeContext context, CancellationToken token)
@@ -34,7 +35,7 @@ namespace ZyRabbit.Operations.Publish.Middleware
 			var callback = GetCallback(context);
 			if (callback == null)
 			{
-				_logger.Debug("No Mandatory Callback registered.");
+				Logger.LogDebug("No Mandatory Callback registered.");
 				await Next.InvokeAsync(context, token);
 				return;
 			}
@@ -42,17 +43,17 @@ namespace ZyRabbit.Operations.Publish.Middleware
 			var channel = GetChannel(context);
 			if (channel == null)
 			{
-				_logger.Warn("Channel not found in Pipe Context. Mandatory Callback not registered.");
+				Logger.LogWarning("Channel not found in Pipe Context. Mandatory Callback not registered.");
 				await Next.InvokeAsync(context, token);
 				return;
 			}
 
-			_logger.Debug("Register Mandatory Callback on channel {channelNumber}", channel.ChannelNumber);
+			Logger.LogDebug("Register Mandatory Callback on channel {channelNumber}", channel.ChannelNumber);
 			channel.BasicReturn += callback;
 			PostInvoke?.Invoke(context, callback);
 
 			await Next.InvokeAsync(context, token);
-			_logger.Debug("Removing Mandatory Callback on channel {channelNumber}", channel.ChannelNumber);
+			Logger.LogDebug("Removing Mandatory Callback on channel {channelNumber}", channel.ChannelNumber);
 			channel.BasicReturn -= callback;
 		}
 

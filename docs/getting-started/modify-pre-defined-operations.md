@@ -15,20 +15,25 @@ Each of the available operations (like `PublishAsync`, `SubscribeAsync` etc) are
 
 ## Stage-based middleware injection
 
-The sequence of middleware can be (and often are) devided into multiple stages, indicated by the `StageMarkerMiddleware`. As an example. the [Publish pipe](https://github.com/pardahlman/ZyRabbit/blob/2.0/src/ZyRabbit.Operations.Publish/PublishMessageExtension.cs) has multiple stages including _ExchangeDeclared_, _ChannelCreated_ and _MessagePublished_. It is possible to inject custom middleware that is executed at each stage. This is done by creating a middleware inherit from `StagedMiddleware`.
+The sequence of middleware can be (and often are) devided into multiple stages, indicated by the `StageMarkerMiddleware`. As an example. the [Publish pipe](https://github.com/zylab-official/ZyRabbit/blob/master/src/ZyRabbit.Operations.Publish/PublishMessageExtension.cs) has multiple stages including _ExchangeDeclared_, _ChannelCreated_ and _MessagePublished_. It is possible to inject custom middleware that is executed at each stage. This is done by creating a middleware inherit from `StagedMiddleware`.
 
 ```csharp
-public class LogAfterPublishMiddleware : StagedMiddleware
+public sealed class LogAfterPublishMiddleware : StagedMiddleware
 {
+  private readonly ILogger<LogAfterPublishMiddleware> _logger;
+
+  public LogAfterPublishMiddleware(ILogger<LogAfterPublishMiddleware> logger)
+  {
+    _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+  }
+
   // define what stage to inject middleware into
   public override string StageMarker => Pipe.StageMarker.MessagePublished;
-
-  private readonly ILogger _logger = Log.ForContext<LogAfterPublishMiddleware>();
 
   public override async Task InvokeAsync(IPipeContext context, CancellationToken ct)
   {
     var msgType = context.GetMessageType();
-    _logger.Information("Message of type {messageType} just published", msgType.Name);
+    _logger.LogInformation("Message of type {messageType} just published", msgType.Name);
     await Next.InvokeAsync(context, ct);
   }
 }

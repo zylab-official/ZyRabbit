@@ -184,18 +184,5 @@ namespace ZyRabbit.Configuration
 			config.Exchange.Type = ExchangeType.Direct;
 			return config;
 		}
-
-		/// <summary>
-		/// Disables RouteWithGlobalId to keep routing keys intact with older versions of
-		/// ZyRabbit and sets exchange type to Direct.
-		/// </summary>
-		/// <param name="config"></param>
-		/// <returns></returns>
-		public static ZyRabbitConfiguration AsLegacy(this ZyRabbitConfiguration config)
-		{
-			config.Exchange.Type = ExchangeType.Direct;
-			config.RouteWithGlobalId = false;
-			return config;
-		}
 	}
 }

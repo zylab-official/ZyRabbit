@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using ZyRabbit.Channel.Abstraction;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Channel
 {
@@ -13,12 +13,12 @@ namespace ZyRabbit.Channel
 		private readonly IChannelFactory _factory;
 		private readonly AutoScalingOptions _options;
 		private Timer _timer;
-		private readonly ILog _logger = LogProvider.For<AutoScalingChannelPool>();
 
-		public AutoScalingChannelPool(IChannelFactory factory, AutoScalingOptions options)
+		public AutoScalingChannelPool(IChannelFactory factory, ILogger<IChannelPool> logger, AutoScalingOptions options)
+			: base(logger)
 		{
-			_factory = factory;
-			_options = options;
+			_factory = factory ?? throw new ArgumentNullException(nameof(factory));
+			_options = options ?? throw new ArgumentNullException(nameof(options));
 			ValidateOptions(options);
 			SetupScaling();
 		}
@@ -44,7 +44,7 @@ namespace ZyRabbit.Channel
 			var activeChannels = GetActiveChannelCount();
 			if (activeChannels  < _options.MinimunPoolSize)
 			{
-				_logger.Debug("Pool currently has {channelCount}, which is lower than the minimal pool size {minimalPoolSize}. Creating channels.", activeChannels, _options.MinimunPoolSize);
+				Logger.LogDebug("Pool currently has {channelCount}, which is lower than the minimal pool size {minimalPoolSize}. Creating channels.", activeChannels, _options.MinimunPoolSize);
 				var delta = _options.MinimunPoolSize - Pool.Count;
 				for (var i = 0; i < delta; i++)
 				{
@@ -69,10 +69,10 @@ namespace ZyRabbit.Channel
 				var scaleUp = Pool.Count < _options.MaximumPoolSize;
 				var scaleDown = _options.MinimunPoolSize < Pool.Count;
 
-				_logger.Debug("Channel pool currently has {channelCount} channels open and a total workload of {totalWorkload}", Pool.Count, ChannelRequestQueue.Count);
+				Logger.LogDebug("Channel pool currently has {channelCount} channels open and a total workload of {totalWorkload}", Pool.Count, ChannelRequestQueue.Count);
 				if (scaleUp && _options.DesiredAverageWorkload < workPerChannel)
 				{
-					_logger.Debug("The estimated workload is {averageWorkload} operations/channel, which is higher than the desired workload ({desiredAverageWorkload}). Creating channel.", workPerChannel, _options.DesiredAverageWorkload);
+					Logger.LogDebug("The estimated workload is {averageWorkload} operations/channel, which is higher than the desired workload ({desiredAverageWorkload}). Creating channel.", workPerChannel, _options.DesiredAverageWorkload);
 
 					var channelCancellation = new CancellationTokenSource(_options.RefreshInterval);
 					_factory
@@ -89,7 +89,7 @@ namespace ZyRabbit.Channel
 
 				if (scaleDown && workPerChannel < _options.DesiredAverageWorkload)
 				{
-					_logger.Debug("The estimated workload is {averageWorkload} operations/channel, which is lower than the desired workload ({desiredAverageWorkload}). Creating channel.", workPerChannel, _options.DesiredAverageWorkload);
+					Logger.LogDebug("The estimated workload is {averageWorkload} operations/channel, which is lower than the desired workload ({desiredAverageWorkload}). Creating channel.", workPerChannel, _options.DesiredAverageWorkload);
 					var toRemove = Pool.FirstOrDefault();
 					Pool.Remove(toRemove);
 					Timer disposeTimer = null;

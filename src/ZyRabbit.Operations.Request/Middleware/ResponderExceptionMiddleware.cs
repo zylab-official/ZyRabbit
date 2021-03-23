@@ -2,10 +2,10 @@
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client.Events;
 using ZyRabbit.Common;
 using ZyRabbit.Exceptions;
-using ZyRabbit.Logging;
 using ZyRabbit.Operations.Request.Core;
 using ZyRabbit.Pipe;
 using ZyRabbit.Serialization;
@@ -23,15 +23,16 @@ namespace ZyRabbit.Operations.Request.Middleware
 	public class ResponderExceptionMiddleware : Pipe.Middleware.Middleware
 	{
 		private readonly ISerializer _serializer;
-		protected Func<IPipeContext, object> ExceptionInfoFunc;
-		protected Func<ExceptionInformation, IPipeContext, Task> HandlerFunc;
-		private readonly ILog _logger = LogProvider.For<ResponderExceptionMiddleware>();
-		protected Func<IPipeContext, Type> ResponseTypeFunc;
+		protected readonly Func<IPipeContext, object> ExceptionInfoFunc;
+		protected readonly Func<ExceptionInformation, IPipeContext, Task> HandlerFunc;
+		protected readonly ILogger<ResponderExceptionMiddleware> Logger;
+		protected readonly Func<IPipeContext, Type> ResponseTypeFunc;
 		private readonly Func<IPipeContext, BasicDeliverEventArgs> _deliveryArgFunc;
 
-		public ResponderExceptionMiddleware(ISerializer serializer, ResponderExceptionOptions options = null)
+		public ResponderExceptionMiddleware(ISerializer serializer, ILogger<ResponderExceptionMiddleware> logger, ResponderExceptionOptions options = null)
 		{
-			_serializer = serializer;
+			_serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			ExceptionInfoFunc = options?.MessageFunc ?? (context => context.GetResponseMessage());
 			HandlerFunc = options?.HandlerFunc;
 			_deliveryArgFunc = options?.DeliveryArgsFunc ?? (context => context.GetDeliveryEventArgs());
@@ -91,7 +92,7 @@ namespace ZyRabbit.Operations.Request.Middleware
 
 		protected virtual Task HandleRespondException(ExceptionInformation exceptionInfo, IPipeContext context)
 		{
-			_logger.Info("An unhandled exception occured when remote tried to handle request.\n  Message: {exceptionMessage}\n  Stack Trace: {stackTrace}", exceptionInfo.Message, exceptionInfo.StackTrace);
+			Logger.LogInformation("An unhandled exception occured when remote tried to handle request.\n  Message: {exceptionMessage}\n  Stack Trace: {stackTrace}", exceptionInfo.Message, exceptionInfo.StackTrace);
 
 			if (HandlerFunc != null)
 			{

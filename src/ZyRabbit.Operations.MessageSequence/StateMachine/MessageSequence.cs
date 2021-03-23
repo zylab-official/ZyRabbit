@@ -4,10 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
-using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Common;
 using ZyRabbit.Configuration;
-using ZyRabbit.Logging;
 using ZyRabbit.Operations.MessageSequence.Configuration;
 using ZyRabbit.Operations.MessageSequence.Configuration.Abstraction;
 using ZyRabbit.Operations.MessageSequence.Model;
@@ -16,6 +14,7 @@ using ZyRabbit.Operations.StateMachine;
 using ZyRabbit.Operations.StateMachine.Trigger;
 using ZyRabbit.Pipe;
 using Stateless;
+using Microsoft.Extensions.Logging;
 
 namespace ZyRabbit.Operations.MessageSequence.StateMachine
 {
@@ -29,14 +28,19 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 		private readonly TriggerConfigurer _triggerConfigurer;
 		private readonly Queue<StepDefinition> _stepDefinitions;
 		private readonly List<Subscription.ISubscription> _subscriptions;
-		private readonly ILog _logger = LogProvider.For<MessageSequence>();
+		private readonly ILogger<MessageSequence> _logger;
 		private IModel _channel;
 
-		public MessageSequence(IBusClient client, INamingConventions naming, ZyRabbitConfiguration clientCfg, SequenceModel model = null) : base(model)
+		public MessageSequence(IBusClient client,
+			INamingConventions naming,
+			ZyRabbitConfiguration clientCfg,
+			ILogger<MessageSequence> logger,
+			SequenceModel model = null) : base(model)
 		{
-			_client = client;
-			_naming = naming;
-			_clientCfg = clientCfg;
+			_client = client ?? throw new ArgumentNullException(nameof(client));
+			_naming = naming ?? throw new ArgumentNullException(nameof(naming));
+			_clientCfg = clientCfg ?? throw new ArgumentNullException(nameof(clientCfg));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_triggerConfigurer = new TriggerConfigurer();
 			_stepDefinitions = new Queue<StepDefinition>();
 			_subscriptions = new List<Subscription.ISubscription>();
@@ -64,7 +68,7 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 		{
 			if (globalMessageId != Guid.Empty)
 			{
-				_logger.Info("Setting Global Message Id to {globalMessageId}", globalMessageId);
+				_logger.LogInformation("Setting Global Message Id to {globalMessageId}", globalMessageId);
 				Model.Id = globalMessageId;
 			}
 			return PublishAsync(message, context => { });
@@ -73,7 +77,7 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 		public IMessageSequenceBuilder PublishAsync<TMessage>(TMessage message, Action<IPipeContext> context, CancellationToken ct = new CancellationToken())
 			where TMessage : new()
 		{
-			_logger.Info("Initializing Message Sequence that starts with {messageType}.", typeof(TMessage).Name);
+			_logger.LogInformation("Initializing Message Sequence that starts with {messageType}.", typeof(TMessage).Name);
 
 			var entryTrigger = StateMachine.SetTriggerParameters<TMessage>(typeof(TMessage));
 
@@ -110,13 +114,13 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 				.Configure(SequenceState.Active)
 				.InternalTransitionAsync(trigger, async (message, transition) =>
 				{
-					_logger.Debug("Received message of type {messageType} for sequence {sequenceId}.", transition.Trigger.Name, Model.Id);
+					_logger.LogDebug("Received message of type {messageType} for sequence {sequenceId}.", transition.Trigger.Name, Model.Id);
 					var matchFound = false;
 					do
 					{
 						if (_stepDefinitions.Peek() == null)
 						{
-							_logger.Info("No matching steps found for sequence. Perhaps {messageType} isn't a registered message for sequence {sequenceId}.", transition.Trigger.Name, Model.Id);
+							_logger.LogInformation("No matching steps found for sequence. Perhaps {messageType} isn't a registered message for sequence {sequenceId}.", transition.Trigger.Name, Model.Id);
 							return;
 						}
 						var step = _stepDefinitions.Dequeue();
@@ -124,7 +128,7 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 						{
 							if (step.Optional)
 							{
-								_logger.Info("The step for {optionalMessageType} is optional. Skipping, as received message is of type {currentMessageType}.", step.Type.Name, typeof(TMessage).Name);
+								_logger.LogInformation("The step for {optionalMessageType} is optional. Skipping, as received message is of type {currentMessageType}.", step.Type.Name, typeof(TMessage).Name);
 								Model.Skipped.Add(new ExecutionResult
 								{
 									Type = step.Type,
@@ -133,7 +137,7 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 							}
 							else
 							{
-								_logger.Info("The step for {messageType} is mandatory. Current message, {currentMessageType} will be dismissed.", step.Type.Name, typeof(TMessage).Name);
+								_logger.LogInformation("The step for {messageType} is mandatory. Current message, {currentMessageType} will be dismissed.", step.Type.Name, typeof(TMessage).Name);
 								return;
 							}
 						}
@@ -143,7 +147,7 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 						}
 					} while (!matchFound);
 
-					_logger.Debug("Invoking message handler for {messageType}", typeof(TMessage).Name);
+					_logger.LogDebug("Invoking message handler for {messageType}", typeof(TMessage).Name);
 					await func(message.Message, message.Context);
 					Model.Completed.Add(new ExecutionResult
 					{
@@ -190,7 +194,7 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 				.Configure(SequenceState.Active)
 				.OnExit(() =>
 				{
-					_logger.Debug("Disposing subscriptions for Message Sequence '{sequenceId}'.", Model.Id);
+					_logger.LogDebug("Disposing subscriptions for Message Sequence '{sequenceId}'.", Model.Id);
 					foreach (var subscription in _subscriptions)
 					{
 						subscription.Dispose();
@@ -203,7 +207,7 @@ namespace ZyRabbit.Operations.MessageSequence.StateMachine
 				.Configure(SequenceState.Completed)
 				.OnEntryFrom(trigger, message =>
 				{
-					_logger.Info("Sequence {sequenceId} completed with message '{messageType}'.", Model.Id, typeof(TMessage).Name);
+					_logger.LogInformation("Sequence {sequenceId} completed with message '{messageType}'.", Model.Id, typeof(TMessage).Name);
 					sequence.Completed = Model.Completed;
 					sequence.Skipped = Model.Skipped;
 					tsc.TrySetResult(message);

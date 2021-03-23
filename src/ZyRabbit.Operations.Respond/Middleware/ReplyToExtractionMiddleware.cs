@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using ZyRabbit.Logging;
 using ZyRabbit.Operations.Respond.Core;
 using ZyRabbit.Pipe;
 
@@ -18,17 +18,18 @@ namespace ZyRabbit.Operations.Respond.Middleware
 
 	public class ReplyToExtractionMiddleware : Pipe.Middleware.Middleware
 	{
-		protected Func<IPipeContext, BasicDeliverEventArgs> DeliveryArgsFunc;
-		protected Func<BasicDeliverEventArgs, PublicationAddress> ReplyToFunc;
-		protected Action<IPipeContext, PublicationAddress> ContextSaveAction;
-		private readonly ILog _logger = LogProvider.For<ReplyToExtractionMiddleware>();
+		protected readonly Func<IPipeContext, BasicDeliverEventArgs> DeliveryArgsFunc;
+		protected readonly Func<BasicDeliverEventArgs, PublicationAddress> ReplyToFunc;
+		protected readonly Action<IPipeContext, PublicationAddress> ContextSaveAction;
+		protected readonly ILogger<ReplyToExtractionMiddleware> Logger;
 
-		public ReplyToExtractionMiddleware(ReplyToExtractionOptions options = null)
+		public ReplyToExtractionMiddleware(ILogger<ReplyToExtractionMiddleware> logger, ReplyToExtractionOptions options = null)
 		{
 			ContextSaveAction = options?.ContextSaveAction ?? ((ctx, addr) => ctx.Properties.Add(RespondKey.PublicationAddress, addr));
 			DeliveryArgsFunc = options?.DeliveryArgsFunc ?? (ctx => ctx.GetDeliveryEventArgs());
 			ReplyToFunc = options?.ReplyToFunc ?? (args =>
 				args.BasicProperties.ReplyToAddress ?? new PublicationAddress(ExchangeType.Direct, string.Empty, args.BasicProperties.ReplyTo));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public override Task InvokeAsync(IPipeContext context, CancellationToken token)
@@ -44,7 +45,7 @@ namespace ZyRabbit.Operations.Respond.Middleware
 			var args = DeliveryArgsFunc(context);
 			if (args == null)
 			{
-				_logger.Warn("Delivery args not found in Pipe context.");
+				Logger.LogWarning("Delivery args not found in Pipe context.");
 			}
 			return args;
 		}
@@ -54,12 +55,12 @@ namespace ZyRabbit.Operations.Respond.Middleware
 			var replyTo = ReplyToFunc(args);
 			if (replyTo == null)
 			{
-				_logger.Warn("Reply to address not found in Pipe context.");
+				Logger.LogWarning("Reply to address not found in Pipe context.");
 			}
 			else
 			{
 				args.BasicProperties.ReplyTo = replyTo.RoutingKey;
-				_logger.Info("Using reply address with exchange {exchangeName} and routing key '{routingKey}'", replyTo.ExchangeName, replyTo.RoutingKey);
+				Logger.LogInformation("Using reply address with exchange {exchangeName} and routing key '{routingKey}'", replyTo.ExchangeName, replyTo.RoutingKey);
 			}
 			return replyTo;
 		}
@@ -68,7 +69,7 @@ namespace ZyRabbit.Operations.Respond.Middleware
 		{
 			if (ContextSaveAction == null)
 			{
-				_logger.Warn("No context save action found. Reply to address will not be saved.");
+				Logger.LogWarning("No context save action found. Reply to address will not be saved.");
 			}
 			ContextSaveAction?.Invoke(context, replyTo);
 		}

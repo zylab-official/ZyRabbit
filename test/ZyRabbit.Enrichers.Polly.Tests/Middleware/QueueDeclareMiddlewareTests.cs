@@ -11,6 +11,7 @@ using ZyRabbit.Pipe;
 using ZyRabbit.Pipe.Middleware;
 using Xunit;
 using QueueDeclareMiddleware = ZyRabbit.Enrichers.Polly.Middleware.QueueDeclareMiddleware;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ZyRabbit.Enrichers.Polly.Tests.Middleware
 {
@@ -44,7 +45,7 @@ namespace ZyRabbit.Enrichers.Polly.Tests.Middleware
 					policyCalled = true;
 					capturedContext = pollyContext;
 				}), PolicyKeys.QueueDeclare);
-			var middleware = new QueueDeclareMiddleware(topology.Object) {Next = new NoOpMiddleware()};
+			var middleware = new QueueDeclareMiddleware(topology.Object, NullLogger<QueueDeclareMiddleware>.Instance) {Next = new NoOpMiddleware()};
 
 			/* Test */
 			await middleware.InvokeAsync(context);

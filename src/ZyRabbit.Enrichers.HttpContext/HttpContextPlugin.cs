@@ -1,4 +1,5 @@
-﻿using ZyRabbit.Enrichers.HttpContext;
+﻿using ZyRabbit.DependencyInjection;
+using ZyRabbit.Enrichers.HttpContext;
 using ZyRabbit.Instantiation;
 
 namespace ZyRabbit

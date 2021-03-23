@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ZyRabbit.Common;
@@ -9,8 +10,8 @@ namespace ZyRabbit.Enrichers.Polly.Middleware
 {
 	public class QueueBindMiddleware : Pipe.Middleware.QueueBindMiddleware
 	{
-		public QueueBindMiddleware(ITopologyProvider topologyProvider, QueueBindOptions options = null)
-			: base(topologyProvider, options) { }
+		public QueueBindMiddleware(ITopologyProvider topologyProvider, ILogger<Pipe.Middleware.QueueBindMiddleware> logger, QueueBindOptions options = null)
+			: base(topologyProvider, logger, options) { }
 
 		protected override Task BindQueueAsync(string queue, string exchange, string routingKey, IPipeContext context, CancellationToken token)
 		{

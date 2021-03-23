@@ -1,4 +1,5 @@
-﻿using ZyRabbit.Enrichers.MessageContext.Dependencies;
+﻿using ZyRabbit.DependencyInjection;
+using ZyRabbit.Enrichers.MessageContext.Dependencies;
 using ZyRabbit.Enrichers.MessageContext.Middleware;
 using ZyRabbit.Instantiation;
 

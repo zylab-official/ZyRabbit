@@ -4,12 +4,13 @@ using Xunit;
 
 namespace ZyRabbit.PerformanceTest
 {
-	public class Harness
+	public sealed class Harness
 	{
 		[Fact]
 		public void PubSubBenchmarks()
 		{
 			var result = BenchmarkRunner.Run<PubSubBenchmarks>();
+			Assert.Empty(result.ValidationErrors);
 			Assert.NotEqual(TimeSpan.Zero, result.TotalTime);
 		}
 
@@ -17,6 +18,7 @@ namespace ZyRabbit.PerformanceTest
 		public void RpcBenchmarks()
 		{
 			var result = BenchmarkRunner.Run<RpcBenchmarks>();
+			Assert.Empty(result.ValidationErrors);
 			Assert.NotEqual(TimeSpan.Zero, result.TotalTime);
 		}
 
@@ -24,6 +26,7 @@ namespace ZyRabbit.PerformanceTest
 		public void MessageContextBenchmarks()
 		{
 			var result = BenchmarkRunner.Run<MessageContextBenchmarks>();
+			Assert.Empty(result.ValidationErrors);
 			Assert.NotEqual(TimeSpan.Zero, result.TotalTime);
 		}
 	}

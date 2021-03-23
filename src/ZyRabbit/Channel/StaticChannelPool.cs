@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using ZyRabbit.Exceptions;
-using ZyRabbit.Logging;
 
 namespace ZyRabbit.Channel
 {
@@ -20,12 +20,13 @@ namespace ZyRabbit.Channel
 		protected readonly List<IRecoverable> Recoverables;
 		protected readonly ConcurrentChannelQueue ChannelRequestQueue;
 		private readonly object _workLock = new object();
+		protected readonly ILogger<IChannelPool> Logger;
 		private LinkedListNode<IModel> _current;
-		private readonly ILog _logger = LogProvider.For<StaticChannelPool>();
 
-		public StaticChannelPool(IEnumerable<IModel> seed)
+		public StaticChannelPool(IEnumerable<IModel> seed, ILogger<IChannelPool> logger)
 		{
-			seed = seed.ToList();
+			seed = (seed ?? throw new ArgumentNullException(nameof(seed))).ToList();
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			Pool = new LinkedList<IModel>(seed);
 			Recoverables = new List<IRecoverable>();
 			ChannelRequestQueue = new ConcurrentChannelQueue();
@@ -40,25 +41,25 @@ namespace ZyRabbit.Channel
 		{
 			if (ChannelRequestQueue.IsEmpty || Pool.Count == 0)
 			{
-				_logger.Debug("Unable to serve channels. The pool consists of {channelCount} channels and {channelRequests} requests for channels.");
+				Logger.LogInformation("Unable to serve channels. The pool consists of {channelCount} channels and {channelRequests} requests for channels.");
 				return;
 			}
 
 			if (!Monitor.TryEnter(_workLock))
 			{
-				_logger.Debug("Unable to acquire work lock for service channels.");
+				Logger.LogDebug("Unable to acquire work lock for service channels.");
 				return;
 			}
 
 			try
 			{
-				_logger.Debug("Starting serving channels.");
+				Logger.LogDebug("Starting serving channels.");
 				do
 				{
 					_current = _current?.Next ?? Pool.First;
 					if (_current == null)
 					{
-						_logger.Debug("Unable to server channels. Pool empty.");
+						Logger.LogDebug("Unable to server channels. Pool empty.");
 						return;
 					}
 
@@ -75,7 +76,7 @@ namespace ZyRabbit.Channel
 							throw new ChannelAvailabilityException("No open channels in pool and no recoverable channels");
 						}
 
-						_logger.Info("No open channels in pool, but {recoveryCount} waiting for recovery", Recoverables.Count);
+						Logger.LogInformation("No open channels in pool, but {recoveryCount} waiting for recovery", Recoverables.Count);
 						return;
 					}
 
@@ -87,12 +88,12 @@ namespace ZyRabbit.Channel
 			}
 			catch (ChannelAvailabilityException e)
 			{
-				_logger.Info(e.Message);
+				Logger.LogError(e.Message);
 				throw;
 			}
 			catch (Exception e)
 			{
-				_logger.Info(e, "An unhandled exception occured when serving channels.");
+				Logger.LogError(e, "An unhandled exception occured when serving channels.");
 			}
 			finally
 			{
@@ -112,18 +113,18 @@ namespace ZyRabbit.Channel
 		{
 			if (!(channel is IRecoverable recoverable))
 			{
-				_logger.Debug("Channel {channelNumber} is not recoverable. Recovery disabled for this channel.", channel.ChannelNumber);
+				Logger.LogWarning("Channel {channelNumber} is not recoverable. Recovery disabled for this channel.", channel.ChannelNumber);
 				return;
 			}
 			if (channel.IsClosed && channel.CloseReason != null && channel.CloseReason.Initiator == ShutdownInitiator.Application)
 			{
-				_logger.Debug("{Channel {channelNumber} is closed by the application. Channel will remain closed and not be part of the channel pool", channel.ChannelNumber);
+				Logger.LogWarning("{Channel {channelNumber} is closed by the application. Channel will remain closed and not be part of the channel pool", channel.ChannelNumber);
 				return;
 			}
 			Recoverables.Add(recoverable);
 			recoverable.Recovery += (sender, args) =>
 			{
-				_logger.Info("Channel {channelNumber} has been recovered and will be re-added to the channel pool", channel.ChannelNumber);
+				Logger.LogInformation("Channel {channelNumber} has been recovered and will be re-added to the channel pool", channel.ChannelNumber);
 				if (Pool.Contains(channel))
 				{
 					return;
@@ -135,7 +136,7 @@ namespace ZyRabbit.Channel
 			{
 				if (args.Initiator == ShutdownInitiator.Application)
 				{
-					_logger.Info("Channel {channelNumber} is being closed by the application. No recovery will be performed.", channel.ChannelNumber);
+					Logger.LogWarning("Channel {channelNumber} is being closed by the application. No recovery will be performed.", channel.ChannelNumber);
 					Recoverables.Remove(recoverable);
 				}
 			};

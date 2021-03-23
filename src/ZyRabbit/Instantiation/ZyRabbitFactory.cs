@@ -7,7 +7,7 @@ namespace ZyRabbit.Instantiation
 	{
 		public static Disposable.BusClient CreateSingleton(ZyRabbitOptions options = null)
 		{
-			var ioc = new SimpleDependencyInjection();
+			var ioc = new SimpleDependencyInjectionContainer();
 			return CreateSingleton(options, ioc, register => ioc);
 		}
 
@@ -19,7 +19,7 @@ namespace ZyRabbit.Instantiation
 
 		public static InstanceFactory CreateInstanceFactory(ZyRabbitOptions options = null)
 		{
-			var ioc = new SimpleDependencyInjection();
+			var ioc = new SimpleDependencyInjectionContainer();
 			return CreateInstanceFactory(options, ioc, register => ioc);
 		}
 

@@ -8,6 +8,8 @@ using RabbitMQ.Client.Exceptions;
 using ZyRabbit.Configuration;
 using ZyRabbit.Enrichers.Polly.Services;
 using Xunit;
+using Microsoft.Extensions.Logging.Abstractions;
+using ZyRabbit.Channel.Abstraction;
 
 namespace ZyRabbit.Enrichers.Polly.Tests.Services
 {
@@ -42,7 +44,11 @@ namespace ZyRabbit.Enrichers.Polly.Tests.Services
 					TimeSpan.FromMilliseconds(16)
 				});
 
-			var factory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local, new ConnectionPolicies{ Connect = policy});
+			var factory = new ChannelFactory(
+				connectionFactory.Object,
+				ZyRabbitConfiguration.Local,
+				NullLogger<ChannelFactory>.Instance,
+				new ConnectionPolicies{ Connect = policy});
 
 			/* Test */
 			/* Assert */
@@ -84,7 +90,11 @@ namespace ZyRabbit.Enrichers.Polly.Tests.Services
 					TimeSpan.FromMilliseconds(16)
 				});
 
-			var factory = new ChannelFactory(connectionFactory.Object, ZyRabbitConfiguration.Local, new ConnectionPolicies { CreateChannel = policy });
+			var factory = new ChannelFactory(
+				connectionFactory.Object,
+				ZyRabbitConfiguration.Local,
+				NullLogger<ChannelFactory>.Instance,
+				new ConnectionPolicies { CreateChannel = policy });
 
 			/* Test */
 			var retrievedChannel = await  factory.CreateChannelAsync();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ZyRabbit.Common;
@@ -22,13 +23,13 @@ namespace ZyRabbit.Operations.Respond.Middleware
 
 	public class RespondExceptionMiddleware : ExceptionHandlingMiddleware
 	{
-		protected Func<IPipeContext, BasicDeliverEventArgs> DeliveryArgsFunc;
-		protected Func<IPipeContext, ConsumeConfiguration> ConsumeConfigFunc;
-		protected Func<IPipeContext, IModel> ChannelFunc;
-		protected Action<IPipeContext, ExceptionInformation> SaveAction;
+		protected readonly Func<IPipeContext, BasicDeliverEventArgs> DeliveryArgsFunc;
+		protected readonly Func<IPipeContext, ConsumeConfiguration> ConsumeConfigFunc;
+		protected readonly Func<IPipeContext, IModel> ChannelFunc;
+		protected readonly Action<IPipeContext, ExceptionInformation> SaveAction;
 
-		public RespondExceptionMiddleware(IPipeBuilderFactory factory, RespondExceptionOptions options = null)
-			: base(factory, new ExceptionHandlingOptions { InnerPipe = options?.InnerPipe })
+		public RespondExceptionMiddleware(IPipeBuilderFactory factory, ILogger<ExceptionHandlingMiddleware> logger, RespondExceptionOptions options = null)
+			: base(factory, logger, new ExceptionHandlingOptions { InnerPipe = options?.InnerPipe })
 		{
 			DeliveryArgsFunc = options?.DeliveryArgsFunc ?? (context => context.GetDeliveryEventArgs());
 			ConsumeConfigFunc = options?.ConsumeConfigFunc ?? (context => context.GetConsumeConfiguration());

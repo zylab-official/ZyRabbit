@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using ZyRabbit.Logging;
 using ZyRabbit.Serialization;
 
 namespace ZyRabbit.Pipe.Middleware
@@ -24,11 +24,12 @@ namespace ZyRabbit.Pipe.Middleware
 		protected Func<IPipeContext, string> BodyContentTypeFunc { get; set; }
 		protected Func<IPipeContext, bool> ActivateContentTypeCheck { get; set; }
 		protected Action<IPipeContext, object> PersistAction;
-		private readonly ILog _logger = LogProvider.For<BodyDeserializationMiddleware>();
+		protected readonly ILogger<BodyDeserializationMiddleware> Logger;
 
-		public BodyDeserializationMiddleware(ISerializer serializer, MessageDeserializationOptions options = null)
+		public BodyDeserializationMiddleware(ISerializer serializer, ILogger<BodyDeserializationMiddleware> logger, MessageDeserializationOptions options = null)
 		{
-			Serializer = serializer;
+			Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+			Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			MessageTypeFunc = options?.BodyTypeFunc ?? (context => context.GetMessageType());
 			BodyBytesFunc = options?.BodyFunc ?? (context =>context.GetDeliveryEventArgs()?.Body);
 			PersistAction = options?.PersistAction ?? ((context, msg) => context.Properties.TryAdd(PipeKey.Message, msg));
@@ -60,7 +61,7 @@ namespace ZyRabbit.Pipe.Middleware
 		{
 			if (string.IsNullOrEmpty(msgContentType))
 			{
-				_logger.Debug("Received message has no content type defined. Assuming it can be processed.");
+				Logger.LogDebug("Received message has no content type defined. Assuming it can be processed.");
 				return true;
 			}
 			return string.Equals(msgContentType, Serializer.ContentType, StringComparison.CurrentCultureIgnoreCase);
@@ -83,7 +84,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var msgType = MessageTypeFunc(context);
 			if (msgType == null)
 			{
-				_logger.Warn("Unable to find message type in Pipe context.");
+				Logger.LogWarning("Unable to find message type in Pipe context.");
 			}
 			return msgType;
 		}
@@ -93,7 +94,7 @@ namespace ZyRabbit.Pipe.Middleware
 			var bodyBytes = BodyBytesFunc(context);
 			if (bodyBytes == null)
 			{
-				_logger.Warn("Unable to find Body (bytes) in Pipe context");
+				Logger.LogWarning("Unable to find Body (bytes) in Pipe context");
 			}
 			return bodyBytes;
 		}
@@ -102,7 +103,7 @@ namespace ZyRabbit.Pipe.Middleware
 		{
 			if (PersistAction == null)
 			{
-				_logger.Warn("No persist action defined. Message will not be saved in Pipe context.");
+				Logger.LogInformation("No persist action defined. Message will not be saved in Pipe context.");
 			}
 			PersistAction?.Invoke(context, message);
 		}

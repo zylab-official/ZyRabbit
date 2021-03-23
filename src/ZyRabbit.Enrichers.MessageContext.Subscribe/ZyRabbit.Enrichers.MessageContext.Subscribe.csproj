@@ -15,10 +15,6 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;LIBLOG_PORTABLE</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ZyRabbit.Operations.Subscribe\ZyRabbit.Operations.Subscribe.csproj" />
   </ItemGroup>

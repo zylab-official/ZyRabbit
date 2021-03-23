@@ -23,7 +23,7 @@
     <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessageContext.Subscribe\ZyRabbit.Enrichers.MessageContext.Subscribe.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.Enrichers.MessageContext.Respond\ZyRabbit.Enrichers.MessageContext.Respond.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.Autofac\ZyRabbit.DependencyInjection.Autofac.csproj" />
-    <ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.Ninject\ZyRabbit.DependencyInjection.Ninject.csproj" />
+		<ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.ServiceCollection\ZyRabbit.DependencyInjection.ServiceCollection.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />

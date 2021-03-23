@@ -15,17 +15,13 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;LIBLOG_PORTABLE</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ZyRabbit\ZyRabbit.csproj" />
     <ProjectReference Include="..\ZyRabbit.Operations.Subscribe\ZyRabbit.Operations.Subscribe.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Stateless" Version="3.0.0" />
+    <PackageReference Include="Stateless" Version="5.10.1" />
   </ItemGroup>
 
 </Project>

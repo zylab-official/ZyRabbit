@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using ZyRabbit.Common;
 
 namespace ZyRabbit.Pipe.Middleware
 {

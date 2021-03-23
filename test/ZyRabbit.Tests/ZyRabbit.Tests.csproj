@@ -4,7 +4,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.Autofac\ZyRabbit.DependencyInjection.Autofac.csproj" />
-    <ProjectReference Include="..\..\src\ZyRabbit.DependencyInjection.Ninject\ZyRabbit.DependencyInjection.Ninject.csproj" />
     <ProjectReference Include="..\..\src\ZyRabbit\ZyRabbit.csproj" />
   </ItemGroup>
   <ItemGroup>

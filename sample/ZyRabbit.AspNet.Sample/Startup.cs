@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -13,17 +12,18 @@ using ZyRabbit.Enrichers.HttpContext;
 using ZyRabbit.Enrichers.MessageContext;
 using ZyRabbit.Instantiation;
 using Microsoft.Extensions.Hosting;
+using ZyRabbit.DependencyInjection;
 
 namespace ZyRabbit.AspNet.Sample
 {
 	public class Startup
 	{
+		private readonly IConfiguration _configuration;
+
 		public Startup(IConfiguration configuration)
 		{
-			Configuration = configuration;
+			_configuration = configuration;
 		}
-
-		public IConfiguration Configuration { get; }
 
 		public void ConfigureServices(IServiceCollection services)
 		{
@@ -63,11 +63,13 @@ namespace ZyRabbit.AspNet.Sample
 
 		private ZyRabbitConfiguration GetZyRabbitConfiguration()
 		{
-			var section = Configuration.GetSection("ZyRabbit");
-			if (!section.GetChildren().Any())
+			const string sectionName = "ZyRabbit";
+			var section = _configuration.GetSection(sectionName);
+			if (!section.Exists())
 			{
-				throw new ArgumentException($"Unable to configuration section 'ZyRabbit'. Make sure it exists in the provided configuration");
+				throw new ArgumentException($"Unable to configuration section '{sectionName}'. Make sure it exists in the provided configuration");
 			}
+
 			return section.Get<ZyRabbitConfiguration>();
 		}
 	}

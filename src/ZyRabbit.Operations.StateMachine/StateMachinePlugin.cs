@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using ZyRabbit.DependencyInjection;
 using ZyRabbit.Instantiation;
 using ZyRabbit.Operations.StateMachine;
 using ZyRabbit.Operations.StateMachine.Core;
@@ -32,7 +34,7 @@ namespace ZyRabbit
 			builder.Register(
 				pipe => {},
 				ioc => ioc
-					.AddSingleton<IGlobalLock>(new GlobalLock(execute))
+					.AddSingleton<IGlobalLock, GlobalLock>(resolver => new GlobalLock(resolver.GetService<ILogger<IGlobalLock>>(), execute))
 					.AddSingleton<IModelRepository>(new ModelRepository(get, addOrUpdate))
 					.AddTransient<IStateMachineActivator, StateMachineActivator>(resolver => new StateMachineActivator(resolver.GetService<IModelRepository>(), resolver))
 				);

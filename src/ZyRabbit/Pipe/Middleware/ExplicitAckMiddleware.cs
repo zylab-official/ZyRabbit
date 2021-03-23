@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using ZyRabbit.Channel.Abstraction;
 using ZyRabbit.Common;
-using ZyRabbit.Configuration.Exchange;
-using ZyRabbit.Configuration.Queue;
-using ExchangeType = RabbitMQ.Client.ExchangeType;
 
 namespace ZyRabbit.Pipe.Middleware
 {
@@ -35,9 +31,9 @@ namespace ZyRabbit.Pipe.Middleware
 
 		public ExplicitAckMiddleware(INamingConventions conventions, ITopologyProvider topology, IChannelFactory channelFactory, ExplicitAckOptions options = null)
 		{
-			Conventions = conventions;
-			Topology = topology;
-			ChannelFactory = channelFactory;
+			Conventions = conventions ?? throw new ArgumentNullException(nameof(conventions));
+			Topology = topology ?? throw new ArgumentNullException(nameof(topology));
+			ChannelFactory = channelFactory ?? throw new ArgumentNullException(nameof(channelFactory));
 			DeliveryArgsFunc = options?.DeliveryArgsFunc ?? (context => context.GetDeliveryEventArgs());
 			ConsumerFunc = options?.ConsumerFunc ?? (context => context.GetConsumer());
 			MessageAcknowledgementFunc = options?.GetMessageAcknowledgement ?? (context => context.GetMessageAcknowledgement());
