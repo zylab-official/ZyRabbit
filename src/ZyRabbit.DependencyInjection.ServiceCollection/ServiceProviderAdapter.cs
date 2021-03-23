@@ -26,6 +26,7 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 				var additionalTypes = additional.Select(a => a.GetType()).ToArray();
 				var additionalParams = new LinkedList<object>(additional);
 
+				// TODO: find a better way to search for the matching constructor
 				var ctor = serviceType.GetConstructors().FirstOrDefault();
 				if (ctor == null)
 				{
