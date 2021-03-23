@@ -30,7 +30,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 							binding.InstancePerDependency();
 							break;
 						}
-					case Lifetime.Singelton:
+					case Lifetime.Singleton:
 						{
 							binding.SingleInstance();
 							break;
@@ -49,7 +49,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 							binding.InstancePerDependency();
 							break;
 						}
-					case Lifetime.Singelton:
+					case Lifetime.Singleton:
 						{
 							binding.SingleInstance();
 							break;
@@ -80,7 +80,7 @@ namespace ZyRabbit.DependencyInjection.Autofac
 						binding.InstancePerDependency();
 						break;
 					}
-				case Lifetime.Singelton:
+				case Lifetime.Singleton:
 					{
 						binding.SingleInstance();
 						break;

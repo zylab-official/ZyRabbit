@@ -4,7 +4,7 @@ namespace ZyRabbit.DependencyInjection
 {
 	public enum Lifetime
 	{
-		Singelton,
+		Singleton,
 		Transient
 	}
 
@@ -33,28 +33,28 @@ namespace ZyRabbit.DependencyInjection
 
 		public static IDependencyRegister AddSingleton(this IDependencyRegister register, Type type, Type implementationType)
 		{
-			register.Register(type, implementationType, Lifetime.Singelton);
+			register.Register(type, implementationType, Lifetime.Singleton);
 			return register;
 		}
 
 		public static IDependencyRegister AddSingleton<TService>(this IDependencyRegister register, TService instance)
 			where TService : class
 		{
-			register.Register(typeof(TService), _ => instance, Lifetime.Singelton);
+			register.Register(typeof(TService), _ => instance, Lifetime.Singleton);
 			return register;
 		}
 
 		public static IDependencyRegister AddSingleton<TService, TImplementation>(this IDependencyRegister register, Func<IDependencyResolver, TService> instanceCreator)
 			where TImplementation : class, TService where TService : class
 		{
-			register.Register(typeof(TService), instanceCreator, Lifetime.Singelton);
+			register.Register(typeof(TService), instanceCreator, Lifetime.Singleton);
 			return register;
 		}
 
 		public static IDependencyRegister AddSingleton<TService, TImplementation>(this IDependencyRegister register)
 			where TImplementation : class, TService where TService : class
 		{
-			register.Register(typeof(TService), typeof(TImplementation), Lifetime.Singelton);
+			register.Register(typeof(TService), typeof(TImplementation), Lifetime.Singleton);
 			return register;
 		}
 

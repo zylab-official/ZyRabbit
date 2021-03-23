@@ -135,7 +135,7 @@ namespace ZyRabbit.DependencyInjection
 						_registrations[serviceType] = (resolver, requestedType) => CreateInstanceFromType(requestedType);
 						break;
 					}
-				case Lifetime.Singelton:
+				case Lifetime.Singleton:
 					{
 						_registrations[serviceType] = (resolver, requestedType) =>
 						{
@@ -166,7 +166,7 @@ namespace ZyRabbit.DependencyInjection
 						_registrations[serviceType] = (resolver, type) => instanceCreator(resolver);
 						break;
 					}
-				case Lifetime.Singelton:
+				case Lifetime.Singleton:
 					{
 						_registrations[serviceType] = (resolver, requestedType) =>
 						{

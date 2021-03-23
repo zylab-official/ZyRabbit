@@ -27,7 +27,7 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 						_collection.AddTransient(type, implementationType);
 						break;
 					}
-				case Lifetime.Singelton:
+				case Lifetime.Singleton:
 					{
 						_collection.AddSingleton(type, implementationType);
 						break;
@@ -51,7 +51,7 @@ namespace ZyRabbit.DependencyInjection.ServiceCollection
 						_collection.Add(new ServiceDescriptor(type, c => instanceCreator(new ServiceProviderAdapter(c)), ServiceLifetime.Transient));
 						break;
 					}
-				case Lifetime.Singelton:
+				case Lifetime.Singleton:
 					{
 						_collection.Add(new ServiceDescriptor(type, c => instanceCreator(new ServiceProviderAdapter(c)), ServiceLifetime.Singleton));
 						break;
